@@ -28,6 +28,13 @@
   color: #61dafb;
 }
 
+.min-h-screen {
+  background-image: url('../public/natureBG.jpg'); /* Adjust the path as necessary */
+  background-size: cover; /* Cover the entire area */
+  background-position: center; /* Center the background image */
+  background-repeat: no-repeat; /* Do not repeat the image */
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

@@ -3,7 +3,7 @@ import TodoItem from './TodoItem';
 
 export default function Todo() {
     return (
-        <dl className="flex-grow items-center justify-center divide-y divide-gray-400 ">
+        <dl className="flex flex-col items-center justify-center w-full">
             <TodoItem/>
             <TodoItem/>
             <TodoItem/>
