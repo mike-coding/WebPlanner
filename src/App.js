@@ -5,14 +5,14 @@ import Todo from './components/Todo';
 import useTasks from './components/UseTasks';
 
 function App() {
-  const { tasks, addTask, toggleTaskCompletion } = useTasks();
+  const { tasks, clearTasks, addTask, toggleTaskCompletion} = useTasks();
   return (
     <div className="relative h-screen">
       <div className="absolute inset-0 bg-cover" style={{ backgroundImage: `url(${mainBG})` }}/>
       <div className="relative flex-grow flex flex-col h-screen ">
         <Navbar/>
         <div className="flex-grow flex items-center justify-center px-20">
-          <Todo storedTasks={tasks} />
+          <Todo storedTasks={tasks} clearTasks={clearTasks} addTask={addTask} toggleTaskCompletion={toggleTaskCompletion}/>
         </div>
       </div>
     </div>

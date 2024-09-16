@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-export default function useTasks({ initialTasks = [] } = {}){
+export default function useTasks(){
     var sampleTask = {
         "id":0,
         "label":"Wash the Dishes",
@@ -10,7 +10,7 @@ export default function useTasks({ initialTasks = [] } = {}){
     const [tasks, setTasks] = useState(() => {
         // Attempt to load tasks from local storage or initialize with given tasks
         const storedTasks = localStorage.getItem('tasks');
-        return storedTasks ? JSON.parse(storedTasks) : initialTasks;
+        return storedTasks ? JSON.parse(storedTasks) : [];
     });
 
     useEffect(() => {
@@ -24,11 +24,15 @@ export default function useTasks({ initialTasks = [] } = {}){
         setTasks([...tasks, newTask]); // should not wrap newTask in curly braces
     };
 
-    const toggleTaskCompletion = (id) => {
+    const toggleTaskCompletion = (thisTask) => {
+        const id=thisTask.id;
         setTasks(tasks.map(task => task.id === id ? { ...task, isCompleted: !task.completed } : task));
     };
 
-    const clearTasks = () =>{setTasks([]);}
+    const clearTasks = () => {
+        setTasks([]);  // Reset tasks to an empty array
+        localStorage.removeItem('tasks');  // Clear tasks from localStorage
+    };
 
     return {
         tasks,

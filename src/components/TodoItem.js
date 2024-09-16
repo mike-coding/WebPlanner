@@ -5,10 +5,9 @@ import { Input } from '@headlessui/react';
 import clsx from 'clsx';
 import useTasks from './UseTasks';
 
-export default function TodoItem({isEntry=false, task}) {
-    const {tasks, addTask, toggleTaskCompletion} = useTasks();
+export default function TodoItem({task, addTask, toggleTaskCompletion}) {
     const [thisTask, setThisTask] = useState({ label: "", isCompleted: false });
-    if (!isEntry)
+    if (task)
     {
         return (
             <div className='py-2'>
@@ -33,7 +32,7 @@ export default function TodoItem({isEntry=false, task}) {
                 <Disclosure>
                     <Button className="flex flex-row items-center justify-center w-full shadow-md rounded border rounded-md border-0 bg-stone-100 hover:bg-stone-200 px-5 opacity-90">
                         <Button className="bg-transparent rounded border rounded-md border-0 py-1 font-large"
-                        onClick={() => addTask(thisTask.label)}>
+                        onClick={() => {addTask(thisTask.label); setThisTask({...thisTask, label:""})}}>
                             <svg className={`stroke-stone-400 opacity-100 size-7 hover:stroke-stone-900`} viewBox="0 0 14 14" fill="none">
                                 <path d="m 3 7 L 11 7 M 7 3 L 7 11" strokeWidth={3} strokeLinecap="round" strokeLinejoin="square" />
                             </svg>
