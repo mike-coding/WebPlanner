@@ -21,16 +21,19 @@ export default function useTasks({ initialTasks = [] } = {}){
     const addTask = (label) => {
         const nextID = tasks.reduce((maxId, task) => Math.max(maxId, task.id), 0) + 1;
         const newTask = { id: nextID, label: label, isCompleted: false };
-        setTasks([...tasks, { newTask}]);
+        setTasks([...tasks, newTask]); // should not wrap newTask in curly braces
     };
 
     const toggleTaskCompletion = (id) => {
         setTasks(tasks.map(task => task.id === id ? { ...task, isCompleted: !task.completed } : task));
     };
 
+    const clearTasks = () =>{setTasks([]);}
+
     return {
         tasks,
         addTask,
-        toggleTaskCompletion
+        toggleTaskCompletion,
+        clearTasks
     };
 };
