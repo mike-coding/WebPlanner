@@ -1,12 +1,6 @@
 import { useState, useEffect } from 'react';
 
 export default function useTasks(){
-    var sampleTask = {
-        "id":0,
-        "label":"Wash the Dishes",
-        "isCompleted":"false"
-    }
-
     const [tasks, setTasks] = useState(() => {
         // Attempt to load tasks from local storage or initialize with given tasks
         const storedTasks = localStorage.getItem('tasks');
@@ -19,14 +13,21 @@ export default function useTasks(){
     }, [tasks]);
 
     const addTask = (label) => {
-        const nextID = tasks.reduce((maxId, task) => Math.max(maxId, task.id), 0) + 1;
-        const newTask = { id: nextID, label: label, isCompleted: false };
-        setTasks([...tasks, newTask]); // should not wrap newTask in curly braces
+        if (label.trim().length > 0)
+        {
+            const nextID = tasks.reduce((maxId, task) => Math.max(maxId, task.id), 0) + 1;
+            const newTask = { id: nextID, label: label, isCompleted: false };
+            setTasks([...tasks, newTask]); // should not wrap newTask in curly braces
+        }
     };
 
-    const toggleTaskCompletion = (thisTask) => {
-        const id=thisTask.id;
-        setTasks(tasks.map(task => task.id === id ? { ...task, isCompleted: !task.completed } : task));
+    const toggleTaskCompletion = (task) => {
+        setTasks(tasks.map(item => {
+            if (item.id === task.id) {
+                return {...item, isCompleted: !item.isCompleted};  // Correctly toggling the status
+            }
+            return item;
+        }));
     };
 
     const clearTasks = () => {

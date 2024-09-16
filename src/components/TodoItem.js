@@ -2,18 +2,21 @@ import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuIt
 import Checkbox from './checkbox';
 import { useState } from 'react';
 import { Input } from '@headlessui/react';
-import clsx from 'clsx';
-import useTasks from './UseTasks';
 
 export default function TodoItem({task, addTask, toggleTaskCompletion}) {
     const [thisTask, setThisTask] = useState({ label: "", isCompleted: false });
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter') {
+            addTask(thisTask.label);
+            setThisTask({ ...thisTask, label: "" }); // Reset input after adding
+        }};
     if (task)
     {
         return (
-            <div className='py-2'>
+            <div className='py-1'>
                 <Disclosure>
-                    <Button className="flex flex-row items-center justify-center w-full shadow-md rounded border rounded-md border-0 bg-stone-100 hover:bg-stone-200 px-5 opacity-90">
-                        <Checkbox className = "shadow-md" checked={task.isCompleted} onChange={() => {}}/> 
+                    <Button className="flex flex-row items-center justify-center w-full shadow-md rounded border rounded-sm border-0 bg-stone-100 hover:bg-stone-200 px-5 opacity-90">
+                        <Checkbox className = "shadow-md" checked={task.isCompleted} onChange={() => toggleTaskCompletion(task)}/> 
                         <span className="flex-1 px-12 py-5 font-mono">{task.label}</span>
                         <DisclosureButton className="bg-transparent rounded border  rounded-md border-0 py-1 font-large ">
                         <svg className={`stroke-stone-400 opacity-100 size-7 hover:stroke-stone-900`} viewBox="0 0 14 14" fill="none">
@@ -28,18 +31,19 @@ export default function TodoItem({task, addTask, toggleTaskCompletion}) {
     else
     {
         return(
-            <div className='py-2'>
+            <div className='py-1'>
                 <Disclosure>
-                    <Button className="flex flex-row items-center justify-center w-full shadow-md rounded border rounded-md border-0 bg-stone-100 hover:bg-stone-200 px-5 opacity-90">
+                    <Button className="flex flex-row items-center justify-center w-full shadow-md rounded border rounded-sm border-0 bg-stone-100 hover:bg-stone-200 px-5 opacity-90">
                         <Button className="bg-transparent rounded border rounded-md border-0 py-1 font-large"
                         onClick={() => {addTask(thisTask.label); setThisTask({...thisTask, label:""})}}>
                             <svg className={`stroke-stone-400 opacity-100 size-7 hover:stroke-stone-900`} viewBox="0 0 14 14" fill="none">
-                                <path d="m 3 7 L 11 7 M 7 3 L 7 11" strokeWidth={3} strokeLinecap="round" strokeLinejoin="square" />
+                                <path d="m 3 7 L 11 7 M 7 3 L 7 11" strokeWidth={3} strokeLinecap="square" strokeLinejoin="square" />
                             </svg>
                         </Button>
                         <Input className="flex-1 px-12 py-5 bg-transparent font-mono text-center ui-selected: basis-1/3 outline-none"
                         value={thisTask.label}
-                        onChange={e => setThisTask({ ...thisTask, label: e.target.value })}/>
+                        onChange={e => setThisTask({ ...thisTask, label: e.target.value })}
+                        onKeyDown={handleKeyDown}/>
                     </Button>
                 </Disclosure>
             </div>
