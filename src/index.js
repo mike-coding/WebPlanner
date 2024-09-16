@@ -5,9 +5,15 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+const tasks = [
+  { id: 1, label: 'Rinse Off Frogs', completed: false },
+  { id: 2, label: 'Increase average to 5+ yards per carry', completed: false },
+  { id: 3, label: 'Double Dutch', completed: true },
+  { id: 4, label: 'Sautee Onions', completed: false }
+];
 root.render(
   <React.StrictMode>
-    <App/>
+    <App storedTasks={tasks}/>
   </React.StrictMode>
 );
 
