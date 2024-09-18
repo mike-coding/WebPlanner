@@ -6,7 +6,7 @@ import { useTasks } from './TaskContext';
 
 export default function TodoItem({task}) {
     const [settingsOpen, setSettingsOpen] = useState(false);
-    const {addTask, toggleTaskCompletion} = useTasks();
+    const {toggleTaskCompletion} = useTasks();
     return (
         <div className='py-1 w-3/5'>
             <Button className={`flex flex-row items-center justify-center w-full shadow-md rounded rounded-sm bg-stone-100 hover:bg-stone-200 px-5 ${task.isCompleted ? 'opacity-50' : 'opacity-90'}`}>

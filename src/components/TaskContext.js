@@ -42,7 +42,8 @@ export function TaskProvider({ children }) {
         }));
     };
 
-    const deleteTask = (taskId) => {
+    const deleteTask = (task) => {
+        const taskId = task.id
         setTasks(prevTasks => {
             const updatedTasks = { ...prevTasks };
             delete updatedTasks[taskId]; // Remove the task from the object
