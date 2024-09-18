@@ -1,14 +1,16 @@
-import { useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
-export default function useTasks(){
+// Create the context
+const TaskContext = createContext();
+
+// Provider component that wraps your app and provides the task data
+export function TaskProvider({ children }) {
     const [tasks, setTasks] = useState(() => {
-        // Attempt to load tasks from local storage or initialize with given tasks
         const storedTasks = localStorage.getItem('tasks');
-        return storedTasks ? JSON.parse(storedTasks) : {};
+        return storedTasks ? JSON.parse(storedTasks) : [];
     });
 
     useEffect(() => {
-        // Save tasks to local storage on changes
         localStorage.setItem('tasks', JSON.stringify(tasks));
     }, [tasks]);
 
@@ -53,12 +55,14 @@ export default function useTasks(){
         localStorage.removeItem('tasks');  // Clear tasks from localStorage
     };
 
-    return {
-        tasks,
-        addTask,
-        toggleTaskCompletion,
-        renameTask,
-        deleteTask,
-        clearTasks
-    };
-};
+    return (
+        <TaskContext.Provider value={{ tasks, addTask, toggleTaskCompletion, renameTask, deleteTask, clearTasks }}>
+            {children}
+        </TaskContext.Provider>
+    );
+}
+
+// Custom hook to use the context
+export function useTasks() {
+    return useContext(TaskContext);
+}

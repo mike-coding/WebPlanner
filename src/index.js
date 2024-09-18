@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { TaskProvider } from './components/TaskContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 const tasks = [
@@ -13,7 +14,9 @@ const tasks = [
 ];
 root.render(
   <React.StrictMode>
-    <App storedTasks={tasks}/>
+    <TaskProvider>
+      <App />
+    </TaskProvider>
   </React.StrictMode>
 );
 
