@@ -1,0 +1,8 @@
+[x] Modify TodoItem if task.isComplete -> reduce opacity
+[] Match completedTask and nonCompletedTask widths -> fixed task size, handle overflow
+[] Task Settings -> due date, category, delete
+[] Todo List Structuring -> Today, This Week, This Month
+[] Habit System
+[] Calendar
+[x] Generalize Content Window
+    [x] Scrollbar - no overflow

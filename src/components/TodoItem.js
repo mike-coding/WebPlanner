@@ -15,7 +15,7 @@ export default function TodoItem({task, addTask, toggleTaskCompletion}) {
         return (
             <div className='py-1'>
                 <Disclosure>
-                    <Button className="flex flex-row items-center justify-center w-full shadow-md rounded border rounded-sm border-0 bg-stone-100 hover:bg-stone-200 px-5 opacity-90">
+                    <Button className={`flex flex-row items-center justify-center w-full shadow-md rounded border rounded-sm border-0 bg-stone-100 hover:bg-stone-200 px-5 ${task.isCompleted ? 'opacity-50' : 'opacity-90'}`}>
                         <Checkbox className = "shadow-md" checked={task.isCompleted} onChange={() => toggleTaskCompletion(task)}/> 
                         <span className="flex-1 px-12 py-5 font-mono">{task.label}</span>
                         <DisclosureButton className="bg-transparent rounded border  rounded-md border-0 py-1 font-large ">
