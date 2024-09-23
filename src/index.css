@@ -28,12 +28,18 @@ code {
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #ffffff55;
+  background: #0000001f;
   border-radius: 3px;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #ffffff75;
+  background: #00000031;
+}
+
+.no-resize {
+  resize: none;
+  width: 40rem;
+  height: 10rem;
 }
 
