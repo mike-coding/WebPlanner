@@ -6,30 +6,14 @@ import {
   ChevronRightIcon,
   PlusIcon,
 } from '@heroicons/react/solid';
-import { useTasks } from './TaskContext';
+import { useAppContext } from './AppContext';
 import CategoryEditorDialog from './CategoryEditorDialog';
 
 function Drawer({ isOpen, setIsOpen }) {
-  const { categories, addCategory } = useTasks();
+  const { categories, addCategory } = useAppContext();
 
   const [showOutsideToggle, setShowOutsideToggle] = useState(!isOpen);
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
-
-  // Open the category creation dialog
-  const handleAddCategory = () => {
-    setIsCategoryDialogOpen(true);
-  };
-
-  // Handle saving a new category
-  const handleCategorySave = (categoryName) => {
-    addCategory(categoryName);
-    setIsCategoryDialogOpen(false);
-  };
-
-  // Close the category creation dialog
-  const handleCategoryDialogClose = () => {
-    setIsCategoryDialogOpen(false);
-  };
 
   // Handle drawer close
   const handleDrawerClose = () => {
@@ -65,12 +49,12 @@ function Drawer({ isOpen, setIsOpen }) {
         className="fixed inset-y-0 left-0 z-50 flex"
         afterLeave={() => setShowOutsideToggle(true)}
       >
-        <div className="bg-white bg-opacity-80 backdrop-blur-xl backdrop-brightness-120 backdrop-saturate-60 backdrop-contrast-70 shadow-xl w-64 p-6 flex flex-col">
+        <div className="bg-white backdrop-blur-xl backdrop-brightness-120 backdrop-saturate-60 backdrop-contrast-70 shadow-xl w-64 p-6 flex flex-col">
           {/* Toggle Button */}
           <div className="absolute top-2 right-[-40px]">
             <button
               onClick={handleDrawerClose}
-              className="bg-white bg-opacity-80 backdrop-blur-xl backdrop-brightness-120 backdrop-saturate-60 backdrop-contrast-70 shadow-xl p-2 rounded-r-md focus:outline-none"
+              className="bg-white backdrop-blur-xl backdrop-brightness-120 backdrop-saturate-60 backdrop-contrast-70 p-2 rounded-r-md focus:outline-none"
             >
               <ChevronLeftIcon className="h-6 w-6 text-stone-700" />
             </button>
@@ -112,7 +96,13 @@ function Drawer({ isOpen, setIsOpen }) {
                 onClick={() => setIsCategoryDialogOpen(true)}
                 className="text-stone-600 hover:text-blue-500"
               >
-                Edit
+                <svg className={`opacity-100 size-7 border-1`} viewBox="-265 80 300 300" fill="#766F6B"
+                  onMouseEnter={(e) => e.currentTarget.setAttribute('fill', '#57534e')}
+                  onMouseLeave={(e) => e.currentTarget.setAttribute('fill', '#766F6B')}>
+                  <path
+                    d="M-189.47 311.552c-1.322-.68-3.347-2.505-4.5-4.058-2.079-2.798-2.1-3.463-2.366-76.737-.297-81.609-.485-78.985 5.959-82.914 3.161-1.928 4.964-2.019 40.06-2.022l36.75-.004v13h-70V300.83l70.75-.256 70.75-.257.263-35.25.263-35.25h11.974v37.05c0 31.16-.241 37.515-1.517 39.983-3.202 6.191-.143 5.968-81.683 5.952-56.979-.011-74.86-.303-76.703-1.25m49.33-53.5c-2.671-1.83-2.09-5.088 4.095-22.99l6.47-18.726 31.246-31.256 31.244-31.257 14.762 14.738 14.763 14.738-31.67 31.681-31.67 31.682-17.681 6.078c-18.02 6.194-19.675 6.602-21.559 5.312m91.823-92.476c-7.837-7.856-14.25-14.736-14.25-15.29 0-1.334 19.89-20.94 22.685-22.36 3.515-1.785 6.047-.084 18.065 12.14 7.82 7.954 11.25 12.152 11.25 13.766 0 1.626-3.525 5.879-11.75 14.175l-11.75 11.853z"
+                    stroke="#766F6B" strokeWidth={1} strokeLinecap="round" strokeLinejoin="square"/>
+                </svg>
               </button>
             </div>
             <hr className="flex w-full border-t-2 pb-4 border-stone-300 opacity-70 shadow-3xl" />
@@ -122,7 +112,7 @@ function Drawer({ isOpen, setIsOpen }) {
                   key={index}
                   className="text-stone-600 hover:text-blue-500 text-left"
                 >
-                  {category.name}
+                  {category.symbol} {category.name}
                 </button>
               ))}
             </div>
@@ -161,7 +151,7 @@ function Drawer({ isOpen, setIsOpen }) {
         <div className="fixed top-2 z-50">
           <button
             onClick={handleDrawerOpen}
-            className="bg-white bg-opacity-80 backdrop-blur-xl backdrop-brightness-120 backdrop-saturate-60 backdrop-contrast-70 shadow-xl p-2 rounded-r-md focus:outline-none"
+            className="bg-white backdrop-blur-xl backdrop-brightness-120 backdrop-saturate-60 backdrop-contrast-70 shadow-xl p-2 rounded-r-md focus:outline-none"
           >
             <ChevronRightIcon className="h-6 w-6 text-stone-700" />
           </button>

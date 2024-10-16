@@ -1,9 +1,9 @@
 import React from 'react';
-import { useTasks } from './TaskContext';
+import { useAppContext } from './AppContext';
 import { Input, Dialog, DialogBackdrop, DialogPanel, MenuButton, MenuItems, MenuItem, Menu, Textarea} from '@headlessui/react';
 
 function TaskTypeSelector({ selectedType, setSelectedType, disabled }) {
-  const { taskTypes } = useTasks();
+  const { taskTypes } = useAppContext();
 
   const availableTypes = Object.values(taskTypes).filter(
     (type) => !type.label.includes('SUBTASK')

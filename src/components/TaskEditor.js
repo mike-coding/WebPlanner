@@ -1,13 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Input, Dialog, DialogBackdrop, DialogPanel, MenuButton, MenuItems, MenuItem, Menu, Textarea} from '@headlessui/react';
-import { useTasks } from './TaskContext';
+import { Input, Dialog, DialogBackdrop, DialogPanel, Textarea} from '@headlessui/react';
+import { useAppContext } from './AppContext';
 import Checkbox from './checkbox';
-import Calendar from './Calendar'
+import DatePicker from './DatePicker'
 import { createPortal } from 'react-dom';
 import TaskTypeSelector from './TaskTypeSelector';
 
 export default function TaskEditor({ task, settingsOpen, setSettingsOpen }) {
-    const { deleteTask, changeTaskAttribute, toggleTaskCompletion } = useTasks();
+    const { deleteTask, changeTaskAttribute, toggleTaskCompletion } = useAppContext();
     const [confirmingDeletion, setConfirmingDeletion] = useState(false);
     const [currentTaskCompleted, setCurrentTaskCompleted] = useState(task.isCompleted);
     const handleToggleCompletion = () => {
@@ -15,60 +15,84 @@ export default function TaskEditor({ task, settingsOpen, setSettingsOpen }) {
     };
     //deleteTask(task); setSettingsOpen(false); 
     return (
-        <Dialog open={settingsOpen} onClose={() => setSettingsOpen(false)} className="relative z-10">
-            <DialogBackdrop className="fixed inset-0 bg-gray-500 bg-opacity-30 backdrop-blur-sm" />
-            <DialogPanel className="fixed inset-0 z-10 flex flex-col min-h-full items-center justify-center">
-                <div className="transform overflow-auto rounded-sm bg-white text-left shadow-xl w-1/2 h-[62vh] transition-all flex flex-col">
-                    <div className="flex items-center px-6 py-5 pt-7">
-                        <div className="px-5 pr-8 pt-1"><Checkbox className="shadow-md mr-4" checked={currentTaskCompleted} onChange={handleToggleCompletion}/></div>
-                        <Input className="font-sans font-bold text-stone-700 py-1 text-2xl flex-grow ui-selected: outline-none"
-                                value={task.label}
-                                onChange={e => changeTaskAttribute(task, 'label', e.target.value)}
-                                autoComplete="off"/>
-                    </div>
-                    <hr className="flex w-full border-t-2 border-stone-300 opacity-70 shadow-3xl" />
-                    <table className="flex flex-col flex-grow w-full py-5 shadow-inner ">
-                        <TaskSetting task={task} attribute="description"/>
-                        <TaskSetting task={task} attribute="dueDate"/>
-                        <TaskSetting task={task} attribute="type"/>
-                        <TaskSetting task={task} attribute="category"/>
-                        
-                        
-                    </table>
-                    {(confirmingDeletion)? 
-                    <div className="bg-gray-100 px-6 py-3 flex justify-end space-x-5 shadow-inner">
-                        <span className="pt-3/2 pr-4 font-sans font-semibold">Confirm Deletion: </span>
-                        <button
-                        type="button"
-                        className="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-500"
-                        onClick={() => { deleteTask(task); setSettingsOpen(false); }}>
-                        Yes, Delete
-                        </button>
-                        <button
-                            type="button"
-                            className="rounded-md bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                            onClick={() => setConfirmingDeletion(false)}>
-                            Nevermind
-                        </button>
-                    </div>
-                    :
-                    <div className="bg-gray-100 px-6 py-3 flex justify-end space-x-5 shadow-inner">
-                        <button
-                            type="button"
-                            className="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-500"
-                            onClick={() => { setConfirmingDeletion(true) }}>
-                            Delete Task
-                        </button>
-                        <button
-                            type="button"
-                            className="rounded-md bg-white px-10 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                            onClick={() => {setSettingsOpen(false); changeTaskAttribute(task, "isCompleted",currentTaskCompleted )}}>
-                            OK
-                        </button>
-                    </div>}
-                </div>
-            </DialogPanel>
-        </Dialog>
+      <Dialog
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        className="relative z-10"
+      >
+        <DialogBackdrop className="fixed inset-0 bg-gray-500 bg-opacity-30 backdrop-blur-sm" />
+        <div className="fixed inset-0 flex items-center justify-center">
+          <DialogPanel className="transform overflow-auto rounded-sm bg-white text-left shadow-xl w-1/2 h-[62vh] transition-all flex flex-col">
+            {/* Your content here */}
+            <div className="flex items-center px-6 py-5 pt-7">
+              <div className="px-5 pr-8 pt-1">
+                <Checkbox
+                  className="shadow-md mr-4"
+                  checked={currentTaskCompleted}
+                  onChange={handleToggleCompletion}
+                />
+              </div>
+              <Input
+                className="font-sans font-bold text-stone-700 py-1 text-2xl flex-grow outline-none"
+                value={task.label}
+                onChange={(e) => changeTaskAttribute(task, 'label', e.target.value)}
+                autoComplete="off"
+              />
+            </div>
+            <hr className="flex w-full border-t-2 border-stone-300 opacity-70 shadow-3xl" />
+            <table className="flex flex-col flex-grow w-full py-5 shadow-inner">
+              <TaskSetting task={task} attribute="description" />
+              <TaskSetting task={task} attribute="dueDate" />
+              <TaskSetting task={task} attribute="type" />
+              <TaskSetting task={task} attribute="category" />
+            </table>
+            {confirmingDeletion ? (
+              <div className="bg-gray-100 px-6 py-3 flex justify-end space-x-5 shadow-inner">
+                <span className="pt-3/2 pr-4 font-sans font-semibold">Confirm Deletion:</span>
+                <button
+                  type="button"
+                  className="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-500"
+                  onClick={() => {
+                    deleteTask(task);
+                    setSettingsOpen(false);
+                  }}
+                >
+                  Yes, Delete
+                </button>
+                <button
+                  type="button"
+                  className="rounded-md bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                  onClick={() => setConfirmingDeletion(false)}
+                >
+                  Nevermind
+                </button>
+              </div>
+            ) : (
+              <div className="bg-gray-100 px-6 py-3 flex justify-end space-x-5 shadow-inner">
+                <button
+                  type="button"
+                  className="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-500"
+                  onClick={() => {
+                    setConfirmingDeletion(true);
+                  }}
+                >
+                  Delete Task
+                </button>
+                <button
+                  type="button"
+                  className="rounded-md bg-white px-10 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                  onClick={() => {
+                    setSettingsOpen(false);
+                    changeTaskAttribute(task, 'isCompleted', currentTaskCompleted);
+                  }}
+                >
+                  OK
+                </button>
+              </div>
+            )}
+          </DialogPanel>
+        </div>
+      </Dialog>
     );
 }
 
@@ -106,7 +130,7 @@ function TaskSetting({task, attribute}){
 }
 
 function TaskTypeWidget({ task }) {
-    const { changeTaskAttribute, taskTypes } = useTasks();
+    const { changeTaskAttribute, taskTypes } = useAppContext();
     const hasCategory = task.category!=null;
   
     const handleTypeChange = (newTypeLabel) => {
@@ -129,7 +153,7 @@ function TaskTypeWidget({ task }) {
 }
 
 function TaskDateWidget({ task }) {
-    const { changeTaskAttribute } = useTasks();
+    const { changeTaskAttribute } = useAppContext();
     const [hovered, setHovered] = useState(false);
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
     const buttonRef = useRef(null);
@@ -240,7 +264,7 @@ function TaskDateWidget({ task }) {
                     }}
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <Calendar
+                    <DatePicker
                       initialDate={task.dueDate ? new Date(task.dueDate) : null}
                       onDateChange={handleDateChange}
                     />
@@ -252,7 +276,7 @@ function TaskDateWidget({ task }) {
 }
 
 function TaskDescriptionWidget({ task }){
-    const {changeTaskAttribute }= useTasks();
+    const {changeTaskAttribute }= useAppContext();
     return (
         <Textarea
         className="w-[28rem] h-[9rem] px-2 py-1 rounded-md resize-none"
@@ -263,14 +287,14 @@ function TaskDescriptionWidget({ task }){
 }
 
 function TaskCategoryWidget({ task }) {
-    const { changeTaskAttribute, categories, taskTypes } = useTasks();
+    const { changeTaskAttribute, categories, taskTypes } = useAppContext();
     const [isOpen, setIsOpen] = useState(false);
     const buttonRef = useRef(null);
     const [dropdownPosition, setDropdownPosition] = useState(null);
   
     // Find the current category
-    const currentCategory =
-      categories.find((cat) => cat.name === task.category)?.name || 'None';
+    const category = categories.find((cat) => cat.name === task.category);
+    const currentCategory = category ? `${category.symbol} ${category.name}` : 'None';
   
     useEffect(() => {
       if (isOpen && buttonRef.current) {
@@ -310,8 +334,7 @@ function TaskCategoryWidget({ task }) {
           <button
             ref={buttonRef}
             onClick={() => setIsOpen((prev) => !prev)}
-            className="inline-flex justify-center w-48 rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
-          >
+            className="inline-flex justify-center w-48 rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
             {currentCategory}
             <svg
               className="-mr-1 ml-2 h-5 w-5 text-gray-500"
@@ -372,7 +395,7 @@ function TaskCategoryWidget({ task }) {
                     className="text-gray-700 block px-4 py-2 text-sm w-full text-left hover:bg-gray-100"
                     role="menuitem"
                   >
-                    {category.name}
+                    {category.symbol} {category.name}
                   </button>
                 ))}
               </div>

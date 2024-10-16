@@ -2,18 +2,18 @@ import { Button } from '@headlessui/react';
 import Checkbox from './checkbox';
 import TaskEditor from './TaskEditor';
 import { useState } from 'react';
-import { useTasks } from './TaskContext';
+import { useAppContext } from './AppContext';
 
 export default function TaskItem({task}) {
     const [settingsOpen, setSettingsOpen] = useState(false);
     const [hovered, setHovered] = useState(false);
     const [confirmingDeletion, setConfirmingDeletion] = useState(false);
     return (
-        <div className='py-1 w-3/5' 
+        <div className='py-1 w-4/5' 
         onMouseEnter={() => {if (!settingsOpen) setHovered(true)}}
         onMouseLeave={() => {setHovered(false); setConfirmingDeletion(false)}} 
         onClick={() => {if (!confirmingDeletion) {setSettingsOpen(true); setHovered(false)} else setConfirmingDeletion(false)}}>
-            <Button className={`flex flex-row items-center justify-center w-full shadow-md rounded rounded-sm bg-stone-100 hover:bg-stone-200 px-5 ${task.isCompleted ? 'opacity-50' : 'opacity-90'}`}>
+            <Button className={`flex flex-row items-center justify-center w-full shadow-md rounded rounded-sm bg-white hover:bg-stone-100 px-5 ${task.isCompleted ? 'opacity-50' : 'opacity-90'}`}>
                 {(confirmingDeletion && hovered)? 
                     <ConfirmDeleteTaskBody task={task} /> :
                     <StandardTaskBody task={task} hovered={hovered} settingsOpen={settingsOpen} setSettingsOpen={setSettingsOpen} setConfirmingDeletion={setConfirmingDeletion} />}
@@ -23,7 +23,7 @@ export default function TaskItem({task}) {
 }
 
 function ConfirmDeleteTaskBody({task}){
-    const {deleteTask} = useTasks();
+    const {deleteTask} = useAppContext();
     return (
         <div className="flex flex-row items-center justify-between w-full ">
             <span className="flex-2 font-sans font-bold text-center ">Confirm Delete:</span>
@@ -37,7 +37,7 @@ function ConfirmDeleteTaskBody({task}){
 }
 
 function StandardTaskBody({task, hovered, settingsOpen,setSettingsOpen,setConfirmingDeletion}){
-    const {toggleTaskCompletion, deleteTask} = useTasks();
+    const {toggleTaskCompletion, deleteTask} = useAppContext();
     return(
         <div className="flex flex-row items-center justify-center w-full">
             <div className="px-3"><Checkbox className = "shadow-md" checked={task.isCompleted} onChange={() => toggleTaskCompletion(task)}/> </div>

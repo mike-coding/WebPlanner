@@ -1,254 +1,150 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useAppContext } from './AppContext';
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/solid';
 
-function Calendar({ initialDate, onDateChange }) {
-    const today = new Date();
-    const [currentDate, setCurrentDate] = useState(
-      initialDate || new Date()
-    );
-    const [selectedDate, setSelectedDate] = useState(initialDate || null);
-    const [showMonthDropdown, setShowMonthDropdown] = useState(false);
-    const [showYearDropdown, setShowYearDropdown] = useState(false);
+function Calendar() {
+  const [viewMode, setViewMode] = useState('month'); // 'month' or 'week'
+  const currentDate = new Date();
+  const [currentMonth, setCurrentMonth] = useState(currentDate);
 
-  useEffect(() => {
-    const handleClickOutside = () => {
-      setShowMonthDropdown(false);
-      setShowYearDropdown(false);
-    };
-    document.addEventListener('click', handleClickOutside);
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, []);
-
-  const goToPreviousMonth = () => {
-    setCurrentDate(
-      new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
-    );
+  // Function to switch months
+  const handlePrevMonth = () => {
+    const prevMonth = new Date(currentMonth);
+    prevMonth.setMonth(prevMonth.getMonth() - 1);
+    setCurrentMonth(prevMonth);
   };
 
-  const goToNextMonth = () => {
-    setCurrentDate(
-      new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
-    );
+  const handleNextMonth = () => {
+    const nextMonth = new Date(currentMonth);
+    nextMonth.setMonth(nextMonth.getMonth() + 1);
+    setCurrentMonth(nextMonth);
   };
 
-  const goToPreviousYear = () => {
-    setCurrentDate(
-      new Date(currentDate.getFullYear() - 1, currentDate.getMonth(), 1)
-    );
-  };
+  // Function to generate days for the month view
+  const generateMonthView = () => {
+    const year = currentMonth.getFullYear();
+    const month = currentMonth.getMonth();
 
-  const goToNextYear = () => {
-    setCurrentDate(
-      new Date(currentDate.getFullYear() + 1, currentDate.getMonth(), 1)
-    );
-  };
+    const firstDayOfMonth = new Date(year, month, 1);
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const firstDayIndex = firstDayOfMonth.getDay();
 
-  const handleDateClick = (day) => {
-    const newSelectedDate = new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth(),
-      day
-    );
-    setSelectedDate(newSelectedDate);
-    if (onDateChange) {
-      onDateChange(newSelectedDate);
+    const totalCells = Math.ceil((firstDayIndex + daysInMonth) / 7) * 7;
+    const days = [];
+
+    for (let cellIndex = 0; cellIndex < totalCells; cellIndex++) {
+      const dayNumber = cellIndex - firstDayIndex + 1;
+
+      if (cellIndex < firstDayIndex || dayNumber > daysInMonth) {
+        // Empty cells before the first day and after the last day
+        days.push(
+          <div key={`empty-${cellIndex}`} className="h-24 border border-stone-200 bg-stone-50"></div>
+        );
+      } else {
+        const isToday =
+          dayNumber === currentDate.getDate() &&
+          month === currentDate.getMonth() &&
+          year === currentDate.getFullYear();
+
+        days.push(
+          <div
+            key={dayNumber}
+            className={`h-24 border border-stone-200 flex flex-col items-center p-1 ${
+              isToday ? 'bg-blue-100' : 'bg-white'
+            } hover:bg-stone-100`}
+          >
+            <span className="font-medium text-stone-700">{dayNumber}</span>
+            {/* Placeholder for events/tasks */}
+          </div>
+        );
+      }
     }
+
+    return days;
   };
 
-  const clearDate = () => {
-    setSelectedDate(null);
-    if (onDateChange) {
-      onDateChange(null);
+  // Function to generate days for the week view
+  const generateWeekView = () => {
+    const days = [];
+    const startOfWeek = new Date(currentDate);
+    startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+
+    for (let i = 0; i < 7; i++) {
+      const dayDate = new Date(startOfWeek);
+      dayDate.setDate(dayDate.getDate() + i);
+
+      const isToday =
+        dayDate.toDateString() === currentDate.toDateString();
+
+      days.push(
+        <div
+          key={i}
+          className={`h-64 border border-stone-200 flex flex-col items-center p-2 ${
+            isToday ? 'bg-blue-100' : 'bg-white'
+          } hover:bg-stone-100`}
+        >
+          <span className="text-sm text-stone-500">
+            {dayDate.toLocaleDateString('en-US', { weekday: 'short' })}
+          </span>
+          <span className="font-medium text-stone-700">{dayDate.getDate()}</span>
+          {/* Placeholder for events/tasks */}
+        </div>
+      );
     }
-  };
 
-  const daysInMonth = new Date(
-    currentDate.getFullYear(),
-    currentDate.getMonth() + 1,
-    0
-  ).getDate();
-
-  const firstDayOfMonth = new Date(
-    currentDate.getFullYear(),
-    currentDate.getMonth(),
-    1
-  ).getDay();
-
-  const calendarDays = [];
-  for (let i = 0; i < firstDayOfMonth; i++) {
-    calendarDays.push(null);
-  }
-  for (let i = 1; i <= daysInMonth; i++) {
-    calendarDays.push(i);
-  }
-
-
-  const LeftArrow = ({ className }) => (
-    <svg
-      className={className}
-      viewBox="0 0 20 20"
-      fill="currentColor"
-      aria-hidden="true"
-    >
-      <path
-        fillRule="evenodd"
-        d="M12.707 15.707a1 1 0 01-1.414 0L6.586 11l4.707-4.707a1 1 0 011.414 1.414L9.414 11l3.293 3.293a1 1 0 010 1.414z"
-        clipRule="evenodd"
-      />
-    </svg>
-  );
-  
-  const RightArrow = ({ className }) => (
-    <svg
-      className={className}
-      viewBox="0 0 20 20"
-      fill="currentColor"
-      aria-hidden="true"
-    >
-      <path
-        fillRule="evenodd"
-        d="M7.293 4.293a1 1 0 011.414 0L13.414 9l-4.707 4.707a1 1 0 01-1.414-1.414L10.586 9 7.293 5.707a1 1 0 010-1.414z"
-        clipRule="evenodd"
-      />
-    </svg>
-  );
-  
-  const DoubleLeftArrow = ({ className }) => (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      aria-hidden="true"
-    >
-      <path d="M11.707 17.707a1 1 0 01-1.414 0L4.586 12l5.707-5.707a1 1 0 111.414 1.414L7.414 12l4.293 4.293a1 1 0 010 1.414z" />
-      <path d="M18.707 17.707a1 1 0 01-1.414 0L11.586 12l5.707-5.707a1 1 0 011.414 1.414L14.414 12l4.293 4.293a1 1 0 010 1.414z" />
-    </svg>
-  );
-  
-  const DoubleRightArrow = ({ className }) => (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      aria-hidden="true"
-    >
-      <path d="M12.293 6.293a1 1 0 011.414 0L18.414 11l-4.707 4.707a1 1 0 01-1.414-1.414L15.586 11l-3.293-3.293a1 1 0 010-1.414z" />
-      <path d="M5.293 6.293a1 1 0 011.414 0L11.414 11l-4.707 4.707a1 1 0 01-1.414-1.414L8.586 11 5.293 7.707a1 1 0 010-1.414z" />
-    </svg>
-  );
-
-  const goToToday = () => {
-    setCurrentDate(new Date());
+    return days;
   };
 
   return (
-    <div className="bg-white rounded-sm shadow-xl font-sans w-96">
-      {/* Calendar Header */}
-      <div className="grid grid-cols-3 items-center px-4 py-2 bg-white">
-        {/* Left Navigation Buttons */}
-        <div className="flex items-center space-x-2 justify-start">
-          <button
-            onClick={goToPreviousYear}
-            className="bg-stone-200 text-stone-700 hover:bg-stone-300 p-2 rounded-md w-8 h-8 flex items-center justify-center"
-          >
-            <DoubleLeftArrow className="w-4 h-4" />
-          </button>
-          <button
-            onClick={goToPreviousMonth}
-            className="bg-stone-200 text-stone-700 hover:bg-stone-300 p-2 rounded-md w-8 h-8 flex items-center justify-center"
-          >
-            <LeftArrow className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Month and Year Display */}
-        <div className="flex items-center justify-center">
-          <span className="text-lg font-bold text-stone-700">
-            {currentDate.toLocaleString('default', { month: 'long' })}
-          </span>
-          <span className="text-lg font-semibold text-stone-500 ml-1">
-            {currentDate.getFullYear()}
-          </span>
-        </div>
-
-        {/* Right Navigation Buttons */}
-        <div className="flex items-center space-x-2 justify-end">
-          <button
-            onClick={goToNextMonth}
-            className="bg-stone-200 text-stone-700 hover:bg-stone-300 p-2 rounded-md w-8 h-8 flex items-center justify-center"
-          >
-            <RightArrow className="w-4 h-4" />
-          </button>
-          <button
-            onClick={goToNextYear}
-            className="bg-stone-200 text-stone-700 hover:bg-stone-300 p-2 rounded-md w-8 h-8 flex items-center justify-center"
-          >
-            <DoubleRightArrow className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
-
-      {/* Days of the Week */}
-      <div className="grid grid-cols-7 text-center text-sm font-semibold text-stone-500 uppercase border-b-2 border-stone-300">
-        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-          <div key={day} className="py-2">
-            {day}
+    <div className="flex flex-col w-full h-full items-center justify-center">
+        <p className="font-sans font-bold text-stone-700 text-2xl py-5"> da Calendar ,</p>
+      <div className="p-6 bg-white rounded shadow-md w-11/12">
+        {/* Header with Month and View Toggle */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={handlePrevMonth}
+              className="p-1 rounded hover:bg-stone-200"
+            >
+              <ChevronLeftIcon className="h-5 w-5 text-stone-600" />
+            </button>
+            <h2 className="text-xl font-semibold text-stone-700">
+              {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+            </h2>
+            <button
+              onClick={handleNextMonth}
+              className="p-1 rounded hover:bg-stone-200"
+            >
+              <ChevronRightIcon className="h-5 w-5 text-stone-600" />
+            </button>
           </div>
-        ))}
-      </div>
+          <button
+            onClick={() => setViewMode(viewMode === 'month' ? 'week' : 'month')}
+            className="px-4 py-2 bg-stone-500 text-white rounded hover:bg-stone-600"
+          >
+            Switch to {viewMode === 'month' ? 'Week' : 'Month'} View
+          </button>
+        </div>
 
-      {/* Calendar Grid */}
-      <div className="grid grid-cols-7 text-center">
-        {calendarDays.map((day, index) => {
-          const isToday =
-            day &&
-            today.getDate() === day &&
-            today.getMonth() === currentDate.getMonth() &&
-            today.getFullYear() === currentDate.getFullYear();
-
-          const isSelected =
-            day &&
-            selectedDate &&
-            selectedDate.getDate() === day &&
-            selectedDate.getMonth() === currentDate.getMonth() &&
-            selectedDate.getFullYear() === currentDate.getFullYear();
-
-          return (
-            <div key={index} className="h-10 flex items-center justify-center">
-              {day && (
-                <button
-                  onClick={() => handleDateClick(day)}
-                  className={`w-8 h-8 flex items-center justify-center rounded-md font-semibold ${
-                    isSelected
-                      ? 'bg-blue-500 text-white'
-                      : isToday
-                      ? 'bg-stone-300 text-white'
-                      : 'text-stone-700'
-                  } hover:bg-stone-200`}
-                >
-                  <span>{day}</span>
-                </button>
-              )}
+        {/* Calendar Header */}
+        <div className="grid grid-cols-7 border-b border-stone-300">
+          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+            <div key={day} className="py-2 text-center font-medium text-stone-600">
+              {day}
             </div>
-          );
-        })}
-      </div>
+          ))}
+        </div>
 
-      {/* 'No Date' and 'Today' Buttons */}
-      <div className="flex justify-center space-x-4 py-2">
-        <button
-          onClick={clearDate}
-          className="text-sm text-white hover:text-black font-semibold bg-stone-300 px-4 py-2 rounded-md"
-        >
-          No Date
-        </button>
-        <button
-          onClick={goToToday}
-          className="text-sm text-white hover:text-black font-semibold bg-stone-300 px-4 py-2 rounded-md"
-        >
-          Today
-        </button>
+        {/* Calendar Body */}
+        {viewMode === 'month' ? (
+          <div className="grid grid-cols-7">
+            {generateMonthView()}
+          </div>
+        ) : (
+          <div className="grid grid-cols-7">
+            {generateWeekView()}
+          </div>
+        )}
       </div>
     </div>
   );

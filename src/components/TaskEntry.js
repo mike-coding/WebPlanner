@@ -1,7 +1,7 @@
 import { Button } from '@headlessui/react';
 import { useState } from 'react';
 import { Input } from '@headlessui/react';
-import {useTasks} from './TaskContext';
+import { useAppContext } from './AppContext';
 
 export default function TaskEntry() {
     const [thisTask, setThisTask] = useState({ label: "", isCompleted: false });
@@ -10,10 +10,10 @@ export default function TaskEntry() {
             addTask(thisTask.label);
             setThisTask({ ...thisTask, label: "" }); // Reset input after adding
         }};
-    const {addTask} = useTasks();
+    const {addTask} = useAppContext();
     return(
-        <div className='py-1 w-3/5'>
-            <Button className="flex flex-row items-center justify-center w-full shadow-md rounded border rounded-sm border-0 bg-stone-100 hover:bg-stone-200 px-8 opacity-90">
+        <div className='py-1 w-4/5'>
+            <Button className="flex flex-row items-center justify-center w-full shadow-md rounded border rounded-sm border-0 bg-white hover:bg-stone-100 px-8 opacity-90">
                 <Button className="bg-transparent rounded border rounded-md border-0 py-1 font-large"
                 onClick={() => {addTask(thisTask.label); setThisTask({...thisTask, label:""})}}>
                     <svg className={`stroke-stone-400 opacity-100 size-7 hover:stroke-stone-900`} viewBox="0 0 14 14" fill="none">

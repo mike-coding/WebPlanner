@@ -1,21 +1,36 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
-export default function useTasks(){
+// Provider component that wraps your app and provides the task data
+export function useTasks() {
     const [tasks, setTasks] = useState(() => {
-        // Attempt to load tasks from local storage or initialize with given tasks
-        const storedTasks = localStorage.getItem('tasks');
-        return storedTasks ? JSON.parse(storedTasks) : {};
+      const storedTasks = localStorage.getItem('tasks');
+      return storedTasks ? JSON.parse(storedTasks) : {};
     });
-
+  
     useEffect(() => {
-        // Save tasks to local storage on changes
-        localStorage.setItem('tasks', JSON.stringify(tasks));
+      localStorage.setItem('tasks', JSON.stringify(tasks));
     }, [tasks]);
+  
+    const taskTypes = {
+      EVENT: { label: 'EVENT', color: '#ED744B' },
+      TASK: { label: 'TASK', color: '#4BBC78' },
+      //RULE: { label: 'RULE', color: '#639BEE' },
+      SUBTASK_EVENT: { label: 'SUBTASK : EVENT', color: '#FF9BB6' },
+      SUBTASK_RULE: { label: 'SUBTASK : RULE', color: '#BF8CDB' },
+    };
 
     const addTask = (label) => {
         if (label.trim().length > 0) {
             const nextID = Object.keys(tasks).reduce((maxId, taskId) => Math.max(maxId, parseInt(taskId)), 0) + 1;
-            const newTask = { id: nextID, label: label, isCompleted: false };
+            const newTask = { 
+                id: nextID, 
+                parentId: null,
+                label: label, 
+                isCompleted: false, 
+                description: "", 
+                category: null, 
+                type: taskTypes.TASK, 
+                dueDate: null };
             setTasks(prevTasks => ({...prevTasks, [nextID]: newTask}));
         }
     };
@@ -30,20 +45,20 @@ export default function useTasks(){
         }));
     };
 
-    const renameTask = (task, newName) => {
+    const changeTaskAttribute = (task, attribute, newValue) => {
         setTasks(prevTasks => ({
             ...prevTasks,
             [task.id]: {
                 ...prevTasks[task.id],
-                label: newName
+                [attribute]: newValue
             }
         }));
     };
 
-    const deleteTask = (taskId) => {
+    const deleteTask = (task) => {
         setTasks(prevTasks => {
             const updatedTasks = { ...prevTasks };
-            delete updatedTasks[taskId]; // Remove the task from the object
+            delete updatedTasks[task.id]; // Remove the task from the object
             return updatedTasks;
         });
     };
@@ -57,8 +72,9 @@ export default function useTasks(){
         tasks,
         addTask,
         toggleTaskCompletion,
-        renameTask,
+        changeTaskAttribute,
         deleteTask,
-        clearTasks
+        clearTasks,
+        taskTypes
     };
-};
+}
