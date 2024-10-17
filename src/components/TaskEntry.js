@@ -4,7 +4,7 @@ import { Input } from '@headlessui/react';
 import { useAppContext } from './AppContext';
 
 export default function TaskEntry() {
-    const [thisTask, setThisTask] = useState({ label: "", isCompleted: false });
+    const [thisTask, setThisTask] = useState({ label: "", isCompleted: false});
     const handleKeyDown = (event) => {
         if (event.key === 'Enter') {
             addTask(thisTask.label);

@@ -19,6 +19,14 @@ export function useTasks() {
       SUBTASK_RULE: { label: 'SUBTASK : RULE', color: '#BF8CDB' },
     };
 
+    function formatDate(date) {
+        if (!date) return 'No Date';
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear();
+        return `${month}-${day}-${year}`;
+      }
+
     const addTask = (label) => {
         if (label.trim().length > 0) {
             const nextID = Object.keys(tasks).reduce((maxId, taskId) => Math.max(maxId, parseInt(taskId)), 0) + 1;
@@ -30,7 +38,7 @@ export function useTasks() {
                 description: "", 
                 category: null, 
                 type: taskTypes.TASK, 
-                dueDate: null };
+                dueDate:formatDate(new Date())};
             setTasks(prevTasks => ({...prevTasks, [nextID]: newTask}));
         }
     };

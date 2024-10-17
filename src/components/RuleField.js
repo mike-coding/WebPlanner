@@ -7,15 +7,21 @@ import { useCategories } from './UseCategories';
 export function RuleField({ index, rule, categoryId, updateRuleInCategory, deleteRuleFromCategory }) {
   const [hovered, setHovered] = useState(false);
   const [confirmingDeletion, setConfirmingDeletion] = useState(false);
+  const [isEditing, setIsEditing] = useState(false); // New state for editing mode
 
   const handleDelete = () => {
     deleteRuleFromCategory(categoryId, rule.id);
   };
 
+  const toggleEditing = () => {
+    setIsEditing(!isEditing);
+    setConfirmingDeletion(false); // Reset deletion confirmation if editing
+  };
+
   return (
     <div
       key={index}
-      className="flex flex-row w-full odd:bg-gray-200 even:bg-white rounded-md font-sans font-semibold "
+      className="flex flex-col w-full odd:bg-gray-200 even:bg-white rounded-md font-sans font-semibold"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => {
         setHovered(false);
@@ -28,11 +34,21 @@ export function RuleField({ index, rule, categoryId, updateRuleInCategory, delet
           setConfirmingDeletion={setConfirmingDeletion}
           categoryId={categoryId}
         />
+      ) : isEditing ? (
+        <EditableRuleBody
+          index={index}
+          rule={rule}
+          categoryId={categoryId}
+          updateRuleInCategory={updateRuleInCategory}
+          toggleEditing={toggleEditing}
+          setConfirmingDeletion={setConfirmingDeletion}
+        />
       ) : (
         <StandardRuleBody
           rule={rule}
           hovered={hovered}
           setConfirmingDeletion={setConfirmingDeletion}
+          toggleEditing={toggleEditing}
           categoryId={categoryId}
         />
       )}
@@ -46,34 +62,43 @@ function formatDate(date) {
 }
 
 export function StandardRuleBody({
-    rule,
-    hovered,
-    setConfirmingDeletion,
-    categoryId
+  rule,
+  hovered,
+  setConfirmingDeletion,
+  toggleEditing,
+  categoryId,
   }) {
     return (
-      <div className="grid grid-cols-7 w-full rounded-md py-4 px-1 font-sans font-semibold ">
+      <div className="grid grid-cols-7 w-full rounded-md py-4 px-1 font-sans font-semibold">
         {/* Name - occupies 2 columns */}
         <div className="col-span-2 flex items-center justify-start pl-3 border-r border-gray-400">
           <span>{rule.name}</span>
         </div>
-  
+
         {/* Start Date - occupies 2 columns */}
-        <div className="col-span-2 flex items-center justify-left border-r border-gray-400">
-          <span className='pl-2 pr-2'>From: </span>
-          <span className="bg-gray-400 rounded-md p-1/2 text-white">{formatDate(rule.start)}</span>
+        <div className="col-span-2 flex items-center justify-center border-r border-gray-400">
+          <span className="pl-4 pr-2 w-1/3">From:</span>
+          <div className="w-2/3 flex justify-center">
+            <span className="bg-gray-400 rounded-md p-1 px-2 text-white">
+              {formatDate(rule.start)}
+            </span>
+          </div>
         </div>
-  
+
         {/* End Date - occupies 2 columns */}
         <div className="col-span-2 flex items-center justify-center border-r border-gray-400">
-          <span>Until: </span>
-          <span>{formatDate(rule.end)}</span>
+          <span className="pl-4 pr-2 w-1/3">Until:</span>
+          <div className="w-2/3 flex justify-center">
+            <span className="bg-gray-400 rounded-md p-1 px-2 text-white">
+              {formatDate(rule.end)}
+            </span>
+          </div>
         </div>
   
-        {/* Repeat Rate - occupies 1 column */}
+        {/* Action buttons */}
         <div className="col-span-1 flex items-center justify-around ">
           {/* Edit Button */}
-          <button className="bg-transparent rounded-md ">
+          <button className="bg-transparent rounded-md " onClick={toggleEditing}>
                 {/* SVG for edit icon */}
                 <svg
                 className="stroke-stone-400 size-5 border-0"
@@ -133,7 +158,7 @@ export function ConfirmDeleteRuleBody({ rule, categoryId, setConfirmingDeletion 
     const { deleteRuleFromCategory } = useAppContext();
   
     return (
-      <div className="grid grid-cols-7 w-full py-3">
+      <div className="grid grid-cols-7 w-full py-4">
         <span className="col-span-3 flex items-center justify-center">
           Delete Rule: {rule.name}?
         </span>
@@ -194,7 +219,7 @@ export function RuleEntry({ index, categoryId, addRuleToCategory }) {
   
     return (
       <div
-        className={`grid grid-cols-7 py-3 px-1 font-sans rounded-sm font-semibold w-full ${bgColor}`}
+        className={`grid grid-cols-7 py-3 px-1 font-sans rounded-md font-semibold w-full ${bgColor}`}
       >
         {/* Name Input - occupies 2 columns */}
         <div className={`col-span-2 flex items-center justify-center border-r border-gray-400 ${bgColor}`}>
@@ -209,20 +234,28 @@ export function RuleEntry({ index, categoryId, addRuleToCategory }) {
   
         {/* Start Date Button - occupies 2 columns */}
         <div className="col-span-2 flex items-center justify-center border-r border-gray-400">
-          <DatePickerButton
-            date={startDate}
-            setDate={setStartDate}
-            label="Start Date"
-          />
+          <span className='pl-4 pr-2 w-1/3'> From: </span>
+          <div className="w-2/3 flex justify-center">
+            <span className="bg-white rounded-md px-2 text-white">
+              <DatePickerButton
+                date={startDate}
+                setDate={setStartDate}
+                label="Start Date"/>
+            </span>
+          </div>
         </div>
   
         {/* End Date Button - occupies 2 columns */}
         <div className="col-span-2 flex items-center justify-center border-r border-gray-400">
-          <DatePickerButton
-            date={endDate}
-            setDate={setEndDate}
-            label="End Date"
-          />
+          <span className='pl-4 pr-2 w-1/3'> Until: </span>
+          <div className="w-2/3 flex justify-center">
+            <span className="bg-white rounded-md px-2 text-white">
+              <DatePickerButton
+              date={endDate}
+              setDate={setEndDate}
+              label="End Date"/>
+            </span>
+          </div>
         </div>
   
         {/* Add Rule Button - occupies 1 column */}
@@ -369,4 +402,355 @@ function DatePickerButton({ date, setDate, label }) {
           )}
       </>
     );
+}
+
+function EditableRuleBody({
+  index,
+  rule,
+  categoryId,
+  updateRuleInCategory,
+  toggleEditing,
+  setConfirmingDeletion,
+}) {
+  const [name, setName] = useState(rule.name);
+  const [startDate, setStartDate] = useState(rule.start ? new Date(rule.start) : null);
+  const [endDate, setEndDate] = useState(rule.end ? new Date(rule.end) : null);
+
+  // Repeat options states
+  const [repeatOption, setRepeatOption] = useState(
+    rule.MONTHLY_WEEKDAYS?.length > 0
+      ? 'MONTHLY_WEEKDAYS'
+      : rule.MONTHLY_DATES?.length > 0
+      ? 'MONTHLY_DATES'
+      : rule.WEEKLY_DAYS?.length > 0
+      ? 'WEEKLY_DAYS'
+      : ''
+  );
+
+  const [months, setMonths] = useState(rule.MONTHS || []);
+  const [monthlyWeekdays, setMonthlyWeekdays] = useState(rule.MONTHLY_WEEKDAYS || []);
+  const [monthlyDates, setMonthlyDates] = useState(rule.MONTHLY_DATES || []);
+  const [weeklyDays, setWeeklyDays] = useState(rule.WEEKLY_DAYS || []);
+
+  const bgColor = index % 2 === 1 ? 'bg-gray-200' : 'bg-white';
+
+  // Handle saving the updated rule
+  const handleSave = () => {
+    const updatedRule = {
+      ...rule,
+      name: name.trim(),
+      start: startDate ? startDate.toISOString() : null,
+      end: endDate ? endDate.toISOString() : null,
+      MONTHS: months,
+      MONTHLY_WEEKDAYS: repeatOption === 'MONTHLY_WEEKDAYS' ? monthlyWeekdays : [],
+      MONTHLY_DATES: repeatOption === 'MONTHLY_DATES' ? monthlyDates : [],
+      WEEKLY_DAYS: repeatOption === 'WEEKLY_DAYS' ? weeklyDays : [],
+    };
+
+    updateRuleInCategory(categoryId, updatedRule);
+    toggleEditing(); // Exit editing mode
+  };
+
+  return (
+    <>
+      {/* Top Section: Name and Dates */}
+      <div className="grid grid-cols-7 w-full rounded-md py-4 px-1 font-sans font-semibold">
+        {/* Name Input */}
+        <div className="col-span-2 flex items-center justify-start pl-3 border-r border-gray-400">
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className={`w-full px-2 py-1 ${bgColor} focus:outline-none`}
+            placeholder="Rule Name"
+          />
+        </div>
+  
+        {/* Start Date Picker */}
+        <div className="col-span-2 flex items-center justify-center border-r border-gray-400">
+          <span className="pl-4 pr-2 w-1/3">From:</span>
+          <div className="w-2/3 flex justify-center">
+            <DatePickerButton date={startDate} setDate={setStartDate} label="Start Date" />
+          </div>
+        </div>
+  
+        {/* End Date Picker */}
+        <div className="col-span-2 flex items-center justify-center border-r border-gray-400">
+          <span className="pl-4 pr-2 w-1/3">Until:</span>
+          <div className="w-2/3 flex justify-center">
+            <DatePickerButton date={endDate} setDate={setEndDate} label="End Date" />
+          </div>
+        </div>
+  
+        {/* Action Buttons */}
+        <div className="col-span-1 flex items-center justify-around">
+          {/* Edit Button (toggles editing mode off) */}
+          <button className="bg-transparent rounded-md" onClick={toggleEditing}>
+            {/* SVG for edit icon or any icon to represent 'Cancel' */}
+            {/* ... */}
+          </button>
+  
+          {/* Delete Button */}
+          <button
+            className="bg-transparent rounded-md"
+            onClick={() => setConfirmingDeletion(true)}
+          >
+            {/* SVG for delete icon */}
+            {/* ... */}
+          </button>
+        </div>
+      </div>
+  
+      {/* Expanded Section: Repeat Options */}
+      <div className="w-full py-2 border-t border-gray-300">
+        {/* Repeat Options */}
+        <div className="w-full px-4 ">
+
+          {/* Months Selector (always shown) */}
+          <MonthsSelector months={months} setMonths={setMonths} />
+          {/* Repeat Option Selector */}
+          <div className="flex space-x-4 mb-4">
+            <label>
+              <input
+                type="radio"
+                value="MONTHLY_WEEKDAYS"
+                checked={repeatOption === 'MONTHLY_WEEKDAYS'}
+                onChange={(e) => setRepeatOption(e.target.value)}
+              />
+              <span className="ml-2">Monthly Weekdays</span>
+            </label>
+            <label>
+              <input
+                type="radio"
+                value="MONTHLY_DATES"
+                checked={repeatOption === 'MONTHLY_DATES'}
+                onChange={(e) => setRepeatOption(e.target.value)}
+              />
+              <span className="ml-2">Monthly Dates</span>
+            </label>
+            <label>
+              <input
+                type="radio"
+                value="WEEKLY_DAYS"
+                checked={repeatOption === 'WEEKLY_DAYS'}
+                onChange={(e) => setRepeatOption(e.target.value)}
+              />
+              <span className="ml-2">Weekly Days</span>
+            </label>
+          </div>
+
+          {/* Conditionally Render Repeat Option Inputs */}
+          {repeatOption === 'MONTHLY_WEEKDAYS' && (
+            <MonthlyWeekdaysSelector
+              monthlyWeekdays={monthlyWeekdays}
+              setMonthlyWeekdays={setMonthlyWeekdays}
+            />
+          )}
+
+          {repeatOption === 'MONTHLY_DATES' && (
+            <MonthlyDatesSelector
+              monthlyDates={monthlyDates}
+              setMonthlyDates={setMonthlyDates}
+            />
+          )}
+
+          {repeatOption === 'WEEKLY_DAYS' && (
+            <WeeklyDaysSelector weeklyDays={weeklyDays} setWeeklyDays={setWeeklyDays} />
+          )}
+
+        </div>
+      </div>
+  
+      {/* Save Button */}
+      <div className="flex justify-end px-4 py-2">
+        <button
+          onClick={handleSave}
+          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+        >
+          OK
+        </button>
+      </div>
+    </>
+  );
+}
+
+function MonthsSelector({ months, setMonths }) {
+  const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+
+  const toggleMonth = (monthIndex) => {
+    if (months.includes(monthIndex + 1)) {
+      setMonths(months.filter((m) => m !== monthIndex + 1));
+    } else {
+      setMonths([...months, monthIndex + 1]);
+    }
+  };
+
+  return (
+    <div className="mb-4 flex items-center flex-row">
+      <span className="font-semibold pr-3">Months:</span>
+      <div className="flex flex-wrap mt-2">
+        {monthNames.map((name, index) => (
+          <button
+            key={index}
+            onClick={() => toggleMonth(index)}
+            className={`px-2 py-1 m-1 rounded-md ${
+              months.includes(index + 1) ? 'bg-blue-500 text-white' : 'bg-gray-300'
+            }`}
+          >
+            {name}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function MonthlyWeekdaysSelector({ monthlyWeekdays, setMonthlyWeekdays }) {
+  const [number, setNumber] = useState('');
+  const [weekday, setWeekday] = useState('');
+
+  const addMonthlyWeekday = () => {
+    if (number && weekday) {
+      setMonthlyWeekdays([...monthlyWeekdays, { number: parseInt(number), weekday }]);
+      setNumber('');
+      setWeekday('');
+    }
+  };
+
+  const removeMonthlyWeekday = (index) => {
+    setMonthlyWeekdays(monthlyWeekdays.filter((_, i) => i !== index));
+  };
+
+  return (
+    <div className="mb-4">
+      <span className="font-semibold">Monthly Weekdays:</span>
+      <div className="mt-2">
+        {monthlyWeekdays.map((item, index) => (
+          <div key={index} className="flex items-center space-x-2 mb-1">
+            <span>
+              {item.number} - {item.weekday}
+            </span>
+            <button onClick={() => removeMonthlyWeekday(index)} className="text-red-500">
+              Remove
+            </button>
+          </div>
+        ))}
+      </div>
+      <div className="flex items-center space-x-2 mt-2">
+        <input
+          type="number"
+          value={number}
+          onChange={(e) => setNumber(e.target.value)}
+          placeholder="Number"
+          className="border rounded-md px-2 py-1 w-16"
+        />
+        <select
+          value={weekday}
+          onChange={(e) => setWeekday(e.target.value)}
+          className="border rounded-md px-2 py-1"
+        >
+          <option value="">Select Weekday</option>
+          {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map((day) => (
+            <option key={day} value={day}>
+              {day}
+            </option>
+          ))}
+        </select>
+        <button onClick={addMonthlyWeekday} className="bg-green-500 text-white px-2 py-1 rounded-md">
+          Add
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function MonthlyDatesSelector({ monthlyDates, setMonthlyDates }) {
+  const [inputDate, setInputDate] = useState('');
+
+  const addDate = () => {
+    const dateNumber = parseInt(inputDate, 10);
+
+    // Check if input is a valid number between 1 and 28
+    if (
+      !isNaN(dateNumber) &&
+      dateNumber >= 1 &&
+      dateNumber <= 28 &&
+      !monthlyDates.includes(dateNumber)
+    ) {
+      setMonthlyDates([...monthlyDates, dateNumber]);
+    }
+
+    // Clear the input field
+    setInputDate('');
+  };
+
+  const removeDate = (date) => {
+    setMonthlyDates(monthlyDates.filter((d) => d !== date));
+  };
+
+  return (
+    <div className="mb-4 flex flex-row items-center">
+      <div className="flex items-center space-x-2 mt-2">
+        <input
+          type="number"
+          value={inputDate}
+          onChange={(e) => setInputDate(e.target.value)}
+          placeholder=""
+          className="rounded-md py-1 text-center border"
+          min="1"
+          max="28"
+        />
+        <button
+          onClick={addDate}
+          className="bg-green-500 text-white px-2 py-1 rounded-md"
+        >
+          +
+        </button>
+      </div>
+      {/* Display selected dates */}
+      <div className="flex flex-wrap mt-2">
+        {monthlyDates.map((date) => (
+          <button
+            key={date}
+            onClick={() => removeDate(date)}
+            className="px-2 py-1 m-1 rounded-md bg-blue-500 text-white"
+          >
+            {date}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+
+function WeeklyDaysSelector({ weeklyDays, setWeeklyDays }) {
+  const weekdays = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+
+  const toggleWeekday = (day) => {
+    if (weeklyDays.includes(day)) {
+      setWeeklyDays(weeklyDays.filter((d) => d !== day));
+    } else {
+      setWeeklyDays([...weeklyDays, day]);
+    }
+  };
+
+  return (
+    <div className="mb-4">
+      <span className="font-semibold">Weekly Days:</span>
+      <div className="flex mt-2">
+        {weekdays.map((day) => (
+          <button
+            key={day}
+            onClick={() => toggleWeekday(day)}
+            className={`px-2 py-1 m-1 rounded-md ${
+              weeklyDays.includes(day) ? 'bg-blue-500 text-white' : 'bg-gray-300'
+            }`}
+          >
+            {day}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
 }

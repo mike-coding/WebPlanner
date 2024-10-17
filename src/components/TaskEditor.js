@@ -293,7 +293,7 @@ function TaskCategoryWidget({ task }) {
     const [dropdownPosition, setDropdownPosition] = useState(null);
   
     // Find the current category
-    const category = categories.find((cat) => cat.name === task.category);
+    const category = categories.find((cat) => cat.id === task.category);
     const currentCategory = category ? `${category.symbol} ${category.name}` : 'None';
   
     useEffect(() => {
@@ -385,7 +385,7 @@ function TaskCategoryWidget({ task }) {
                   <button
                     key={index}
                     onClick={() => {
-                      changeTaskAttribute(task, 'category', category.name);
+                      changeTaskAttribute(task, 'category', category.id);
                       changeTaskAttribute(task, 'type', {
                         label: category.type,
                         color: taskTypes[category.type].color,

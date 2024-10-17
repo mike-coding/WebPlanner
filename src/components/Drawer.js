@@ -1,19 +1,20 @@
-// components/Drawer.js
 import React, { useState } from 'react';
 import { Transition } from '@headlessui/react';
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
-  PlusIcon,
 } from '@heroicons/react/solid';
 import { useAppContext } from './AppContext';
 import CategoryEditorDialog from './CategoryEditorDialog';
 
 function Drawer({ isOpen, setIsOpen }) {
-  const { categories, addCategory } = useAppContext();
+  const { categories } = useAppContext();
 
   const [showOutsideToggle, setShowOutsideToggle] = useState(!isOpen);
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
+
+  // New state variable to track the category being edited
+  const [editingCategoryId, setEditingCategoryId] = useState(null);
 
   // Handle drawer close
   const handleDrawerClose = () => {
@@ -32,7 +33,7 @@ function Drawer({ isOpen, setIsOpen }) {
       {/* Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 "
+          className="fixed inset-0 z-40"
           onClick={handleDrawerClose}
         ></div>
       )}
@@ -61,7 +62,7 @@ function Drawer({ isOpen, setIsOpen }) {
           </div>
 
           {/* Overview Section */}
-          <div className="mb-6 flex flex-row justify-center items-center w-full ">
+          <div className="mb-6 flex flex-row justify-center items-center w-full">
             <button className="text-xl bg-stone-500 p-3 pt-2 px-8 rounded-md font-semibold text-white hover:bg-stone-600">
               Overview
             </button>
@@ -93,7 +94,10 @@ function Drawer({ isOpen, setIsOpen }) {
                 Categories
               </h2>
               <button
-                onClick={() => setIsCategoryDialogOpen(true)}
+                onClick={() => {
+                  setIsCategoryDialogOpen(true);
+                  setEditingCategoryId(null); // Open dialog without editing a specific category
+                }}
                 className="text-stone-600 hover:text-blue-500"
               >
                 <svg className={`opacity-100 size-7 border-1`} viewBox="-265 80 300 300" fill="#766F6B"
@@ -102,15 +106,19 @@ function Drawer({ isOpen, setIsOpen }) {
                   <path
                     d="M-189.47 311.552c-1.322-.68-3.347-2.505-4.5-4.058-2.079-2.798-2.1-3.463-2.366-76.737-.297-81.609-.485-78.985 5.959-82.914 3.161-1.928 4.964-2.019 40.06-2.022l36.75-.004v13h-70V300.83l70.75-.256 70.75-.257.263-35.25.263-35.25h11.974v37.05c0 31.16-.241 37.515-1.517 39.983-3.202 6.191-.143 5.968-81.683 5.952-56.979-.011-74.86-.303-76.703-1.25m49.33-53.5c-2.671-1.83-2.09-5.088 4.095-22.99l6.47-18.726 31.246-31.256 31.244-31.257 14.762 14.738 14.763 14.738-31.67 31.681-31.67 31.682-17.681 6.078c-18.02 6.194-19.675 6.602-21.559 5.312m91.823-92.476c-7.837-7.856-14.25-14.736-14.25-15.29 0-1.334 19.89-20.94 22.685-22.36 3.515-1.785 6.047-.084 18.065 12.14 7.82 7.954 11.25 12.152 11.25 13.766 0 1.626-3.525 5.879-11.75 14.175l-11.75 11.853z"
                     stroke="#766F6B" strokeWidth={1} strokeLinecap="round" strokeLinejoin="square"/>
-                </svg>
+                  </svg>
               </button>
             </div>
             <hr className="flex w-full border-t-2 pb-4 border-stone-300 opacity-70 shadow-3xl" />
             <div className="flex flex-col space-y-2">
-              {categories.map((category, index) => (
+              {categories.map((category) => (
                 <button
-                  key={index}
+                  key={category.id}
                   className="text-stone-600 hover:text-blue-500 text-left"
+                  onClick={() => {
+                    setIsCategoryDialogOpen(true);
+                    setEditingCategoryId(category.id);
+                  }}
                 >
                   {category.symbol} {category.name}
                 </button>
@@ -121,7 +129,7 @@ function Drawer({ isOpen, setIsOpen }) {
           {/* Profile Section */}
           <div className="mt-auto">
             <button className="flex items-center space-x-3 hover:text-blue-500">
-            <svg className="size-10" viewBox="0 0 500 500"> <path d="M335.7 88.94c-4.742.194-9.563 1.486-14.204 4.165-38.934 22.48-89.77 21.953-127.79.002-6.09-3.516-12.285-4.61-18.145-3.892 5.914 7.778 9.438 17.572 9.438 28.09 
+              <svg className="size-10" viewBox="0 0 500 500"> <path d="M335.7 88.94c-4.742.194-9.563 1.486-14.204 4.165-38.934 22.48-89.77 21.953-127.79.002-6.09-3.516-12.285-4.61-18.145-3.892 5.914 7.778 9.438 17.572 9.438 28.09 
                 0 23.15-17.037 42.83-39.176 45.095-12.775 14.92-21.553 31.807-24.386 49.983 44.73-23.79 90.947-35.572 137.064-35.508 46.15.064 92.197 11.987 136.56 
                 35.62-2.69-18.15-11.216-35.043-23.794-49.92-.585.026-1.17.048-1.76.048-24.18 0-43.447-20.7-43.447-45.318 0-10.64 3.6-20.543 9.64-28.364zm-194.15 3.216c-12.67 0-23.277 
                 10.85-23.277 25.15 0 14.297 10.608 25.147 23.278 25.147 12.67 0 23.276-10.85 23.276-25.148s-10.606-25.15-23.275-25.15zm227.956 0c-12.67 0-23.277 10.85-23.277 25.15 0 14.297 
@@ -161,10 +169,20 @@ function Drawer({ isOpen, setIsOpen }) {
       {/* Category Editor Dialog */}
       <CategoryEditorDialog
         isOpen={isCategoryDialogOpen}
-        onClose={() => setIsCategoryDialogOpen(false)}
+        onClose={() => {
+          setIsCategoryDialogOpen(false);
+          setEditingCategoryId(null); // Reset editing category ID
+        }}
+        editingCategoryId={editingCategoryId} // Pass the editing category ID
       />
     </>
   );
 }
 
 export default Drawer;
+
+
+
+
+
+

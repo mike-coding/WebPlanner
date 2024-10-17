@@ -6,13 +6,21 @@ import { emojiList } from '../utils/emojiList'; // Import the emoji list
 import { CategoryField, CategoryEntry } from './CategoryField';
 import { RuleField, RuleEntry} from './RuleField';
 
-function CategoryEditorDialog({ isOpen, onClose }) {
+function CategoryEditorDialog({ isOpen, onClose, editingCategoryId }) {
   const { categories } = useAppContext();
-  const [editingCategoryId, setEditingCategoryId] = useState(null);
+  const [localEditingCategoryId, setLocalEditingCategoryId] = useState(null);
+
+  useEffect(() => {
+    if (editingCategoryId) {
+      setLocalEditingCategoryId(editingCategoryId);
+    } else {
+      setLocalEditingCategoryId(null);
+    }
+  }, [editingCategoryId]);
 
   const handleCancel = () => {
     onClose();
-    setEditingCategoryId(null);
+    setLocalEditingCategoryId(null);
   };
 
   if (!isOpen) {
@@ -28,17 +36,16 @@ function CategoryEditorDialog({ isOpen, onClose }) {
     >
       <DialogBackdrop className="fixed inset-0 bg-black opacity-50" />
       <DialogPanel className="bg-white rounded-md shadow-md w-3/5 max-h-[80vh] overflow-auto relative">
-        {editingCategoryId ? (
+        {localEditingCategoryId ? (
           <CategoryEditor
-            categoryId={editingCategoryId}
-            onClose={() => setEditingCategoryId(null)}
+            categoryId={localEditingCategoryId}
+            onClose={() => setLocalEditingCategoryId(null)}
           />
         ) : (
-          <div className="p-6 ">
+          <div className="p-6">
             <h2 className="text-lg font-semibold mb-4 flex flex-row justify-between items-center">
               Categories
               <button onClick={onClose} className="ml-10 p-1 rounded-sm bg-gray-200">
-                {/* SVG for close icon */}
                 <svg
                   className="w-6 h-6 text-gray-500 hover:text-gray-700"
                   fill="none"
@@ -54,17 +61,20 @@ function CategoryEditorDialog({ isOpen, onClose }) {
 
             {/* Existing Categories and Category Entry */}
             <div className="flex flex-col w-full">
-              {categories.map((category, index) => (
-                <CategoryField
-                  setEditingCategoryId={setEditingCategoryId}
-                  category={category}
-                  index={index}
-                  key={category.id}
-                />
-              ))}
-
               {/* Category Entry with index for styling */}
-              <CategoryEntry index={categories.length} />
+              <CategoryEntry index={0} />
+
+              {[...categories].reverse().map((category, index) => {
+                const originalIndex = categories.length -1 - index;
+                return (
+                  <CategoryField
+                    setEditingCategoryId={setLocalEditingCategoryId}
+                    category={category}
+                    index={originalIndex}
+                    key={category.id}
+                  />
+                );
+              })}
             </div>
           </div>
         )}
@@ -260,14 +270,14 @@ function CategoryEditor({ categoryId, onClose }) {
 
       {/* Body */}
       <div className="flex flex-row divide-x divide-gray-200 h-96">
-        {/* Subcategories Table */}
+        {/* Tasks Table */}
         <div className="w-1/4 p-4 overflow-auto">
           <h3 className="text-lg font-semibold mb-2 flex flex-row justify-center pb-2 border-b">
-            Subcategories
+            Tasks
           </h3>
-          {/* Implement subcategories table here */}
+          {/* Implement tasks table here */}
           <br/>
-          <p className="text-gray-500 text-center">No subcategories yet.</p>
+          <p className="text-gray-500 text-center">No tasks yet.</p>
         </div>
 
         {/* Rules Table */}
@@ -276,21 +286,24 @@ function CategoryEditor({ categoryId, onClose }) {
             Rules
           </h3>
           <div className="flex flex-col w-full px-2">
-            {category.rules.map((rule, index) => (
-              <RuleField
-                key={rule.id}
-                index={index}
-                rule={rule}
-                categoryId={categoryId}
-                updateRuleInCategory={updateRuleInCategory}
-                deleteRuleFromCategory={deleteRuleFromCategory}
-              />
-            ))}
             <RuleEntry
-              index={category.rules.length}
+              index={0}
               categoryId={categoryId}
               addRuleToCategory={addRuleToCategory}
             />
+
+            {[...category.rules].reverse().map((rule, index) => {
+              return (
+                <RuleField
+                  key={rule.id}
+                  index={index}
+                  rule={rule}
+                  categoryId={categoryId}
+                  updateRuleInCategory={updateRuleInCategory}
+                  deleteRuleFromCategory={deleteRuleFromCategory}
+                />
+              );
+            })}
           </div>
         </div>
       </div>
