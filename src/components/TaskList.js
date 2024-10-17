@@ -204,7 +204,7 @@ export default function TaskList() {
           .map((task) => (
             <TaskItem key={task.id} task={task} />
           ))}
-      </dl>
+      </dl> 
 
       <hr className="w-1/4 border-t-4 border-white my-4 opacity-60 shadow-3xl" />
 
