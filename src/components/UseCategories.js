@@ -16,7 +16,7 @@ export function useCategories() {
     useEffect(() => {
       localStorage.setItem('categories', JSON.stringify(categories));
     }, [categories]);
-  
+
     const taskTypes = {
       EVENT: { label: 'EVENT', color: '#ED744B' },
       TASK: { label: 'TASK', color: '#4BBC78' },

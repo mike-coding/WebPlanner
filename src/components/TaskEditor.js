@@ -132,6 +132,7 @@ function TaskSetting({task, attribute}){
 function TaskTypeWidget({ task }) {
     const { changeTaskAttribute, taskTypes } = useAppContext();
     const hasCategory = task.category!=null;
+    const autoTask = task.type.label.includes("AUTO");
   
     const handleTypeChange = (newTypeLabel) => {
       const newType = taskTypes[newTypeLabel];
@@ -146,7 +147,7 @@ function TaskTypeWidget({ task }) {
         <TaskTypeSelector
         selectedType={task.type.label}
         setSelectedType={handleTypeChange}
-        disabled={hasCategory}
+        disabled={(hasCategory)}
         />
         </div>
     );
@@ -158,6 +159,7 @@ function TaskDateWidget({ task }) {
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
     const buttonRef = useRef(null);
     const [dropdownPosition, setDropdownPosition] = useState(null);
+    const autoTask = task.type.label.includes("AUTO");
 
     useEffect(() => {
         if (isCalendarOpen && buttonRef.current) {
@@ -183,13 +185,10 @@ function TaskDateWidget({ task }) {
         }
       }, [isCalendarOpen]);
 
-    function formatDate(date) {
-      if (!date) return 'No Date';
-      const day = date.getDate().toString().padStart(2, '0');
-      const month = (date.getMonth() + 1).toString().padStart(2, '0');
-      const year = date.getFullYear();
-      return `${month}-${day}-${year}`;
-    }
+    const formatDate = (date) => {
+      if (!date) return null;
+      return date.toISOString().split('T')[0]; // 'YYYY-MM-DD'
+    };
 
     function CalendarIcon({color}) {
         return (
@@ -243,6 +242,7 @@ function TaskDateWidget({ task }) {
                   onMouseEnter={() => setHovered(true)}
                   onMouseLeave={() => setHovered(false)}
                   onClick={() => setIsCalendarOpen(!isCalendarOpen)}
+                  disabled = {autoTask}
                 >
                   <div className="flex items-center justify-center">
                     <span className={`pr-2 ${hovered ? 'text-black' : 'text-stone-500'}`}>
@@ -295,6 +295,7 @@ function TaskCategoryWidget({ task }) {
     // Find the current category
     const category = categories.find((cat) => cat.id === task.category);
     const currentCategory = category ? `${category.symbol} ${category.name}` : 'None';
+    const autoTask = task.type.label.includes("AUTO");
   
     useEffect(() => {
       if (isOpen && buttonRef.current) {
@@ -334,7 +335,8 @@ function TaskCategoryWidget({ task }) {
           <button
             ref={buttonRef}
             onClick={() => setIsOpen((prev) => !prev)}
-            className="inline-flex justify-center w-48 rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+            className="inline-flex justify-center w-48 rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+            disabled={autoTask}>
             {currentCategory}
             <svg
               className="-mr-1 ml-2 h-5 w-5 text-gray-500"

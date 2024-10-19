@@ -7,16 +7,68 @@ import { useAppContext } from './AppContext';
 
 export default function TaskList() {
   const { tasks, categories } = useAppContext();
-  const [timeFilter, setTimeFilter] = useState('today'); // Default filter is 'Today'
-  const [categoryFilters, setCategoryFilters] = useState([]);
-  const [includeNoCategory, setIncludeNoCategory] = useState(true);
-  const [includeNoDueDate, setIncludeNoDueDate] = useState(true);
-  const [includeOverdue, setIncludeOverdue] = useState(true); // New state variable
 
-  // Initialize category filters to include all categories
+  // Function to parse local date from 'YYYY-MM-DD' string
+  const parseLocalDate = (dateString) => {
+    if (!dateString) return null;
+    const [year, month, day] = dateString.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  };
+
+  // Initialize filter settings from localStorage or set defaults
+  const [timeFilter, setTimeFilter] = useState(() => {
+    const savedFilters = JSON.parse(localStorage.getItem('taskListFilters'));
+    return savedFilters?.timeFilter || 'today';
+  });
+
+  const [includeNoCategory, setIncludeNoCategory] = useState(() => {
+    const savedFilters = JSON.parse(localStorage.getItem('taskListFilters'));
+    return savedFilters?.includeNoCategory ?? true;
+  });
+
+  const [includeNoDueDate, setIncludeNoDueDate] = useState(() => {
+    const savedFilters = JSON.parse(localStorage.getItem('taskListFilters'));
+    return savedFilters?.includeNoDueDate ?? true;
+  });
+
+  const [includeOverdue, setIncludeOverdue] = useState(() => {
+    const savedFilters = JSON.parse(localStorage.getItem('taskListFilters'));
+    return savedFilters?.includeOverdue ?? true;
+  });
+
+  const [categoryFilters, setCategoryFilters] = useState(() => {
+    const savedFilters = JSON.parse(localStorage.getItem('taskListFilters'));
+    return savedFilters?.categoryFilters || [];
+  });
+
+  // Update category filters when categories change
   useEffect(() => {
-    setCategoryFilters(categories.map((c) => c.id));
+    if (categories.length > 0) {
+      // If categoryFilters is empty, initialize it to include all categories
+      if (categoryFilters.length === 0) {
+        setCategoryFilters(categories.map((c) => c.id));
+      } else {
+        // Ensure categoryFilters only contains existing category IDs
+        const validCategoryIds = categories.map((c) => c.id);
+        const updatedCategoryFilters = categoryFilters.filter((id) =>
+          validCategoryIds.includes(id)
+        );
+        setCategoryFilters(updatedCategoryFilters);
+      }
+    }
   }, [categories]);
+
+  // Save filter settings to localStorage whenever they change
+  useEffect(() => {
+    const filterSettings = {
+      timeFilter,
+      categoryFilters,
+      includeNoCategory,
+      includeNoDueDate,
+      includeOverdue,
+    };
+    localStorage.setItem('taskListFilters', JSON.stringify(filterSettings));
+  }, [timeFilter, categoryFilters, includeNoCategory, includeNoDueDate, includeOverdue]);
 
   // Toggle category selection
   const toggleCategoryFilter = (categoryId) => {
@@ -49,47 +101,70 @@ export default function TaskList() {
     const now = new Date();
     let startDate = new Date();
     let endDate = new Date();
-
+    let isInSelectedTimeRange;
+  
     switch (timeFilter) {
       case 'today':
         startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+        // Use half-open interval [startDate, endDate)
+        isInSelectedTimeRange = (taskDate) =>
+          taskDate && taskDate >= startDate && taskDate < endDate;
         break;
+  
       case 'thisWeek':
+        // Start from Sunday (beginning of the week)
         startDate = new Date(now);
-        startDate.setDate(now.getDate() - now.getDay()); // Start of the week (Sunday)
+        startDate.setDate(now.getDate() - now.getDay());
+        startDate.setHours(0, 0, 0, 0);
+  
+        // End on Saturday (end of the week)
         endDate = new Date(startDate);
-        endDate.setDate(startDate.getDate() + 7);
+        endDate.setDate(startDate.getDate() + 6);
+        endDate.setHours(23, 59, 59, 999);
+        // Use closed interval [startDate, endDate]
+        isInSelectedTimeRange = (taskDate) =>
+          taskDate && taskDate >= startDate && taskDate <= endDate;
         break;
+  
       case 'thisMonth':
         startDate = new Date(now.getFullYear(), now.getMonth(), 1);
         endDate = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+        // Use half-open interval [startDate, endDate)
+        isInSelectedTimeRange = (taskDate) =>
+          taskDate && taskDate >= startDate && taskDate < endDate;
         break;
+  
       case 'upcoming':
         startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 14);
+        endDate = new Date(now);
+        endDate.setDate(endDate.getDate() + 14);
+        // Use half-open interval [startDate, endDate)
+        isInSelectedTimeRange = (taskDate) =>
+          taskDate && taskDate >= startDate && taskDate < endDate;
         break;
+  
       default:
+        isInSelectedTimeRange = () => true;
         break;
     }
-
+  
     // Filter tasks
     return Object.values(tasks).filter((task) => {
-      const taskDate = task.dueDate ? new Date(task.dueDate) : null;
+      const taskDate = task.dueDate ? parseLocalDate(task.dueDate) : null;
       const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       const isOverdue = taskDate && taskDate < todayStart;
-      const isInSelectedTimeRange = taskDate && taskDate >= startDate && taskDate < endDate;
       const isUndated = !taskDate;
-
+  
       const inTimeRange =
         (includeOverdue && isOverdue) ||
-        isInSelectedTimeRange ||
+        isInSelectedTimeRange(taskDate) ||
         (includeNoDueDate && isUndated);
-
+  
       const inCategory =
         (task.category && categoryFilters.includes(task.category)) ||
         (includeNoCategory && !task.category);
-
+  
       return inTimeRange && inCategory;
     });
   };
@@ -110,7 +185,6 @@ export default function TaskList() {
             </div>
             {open && (
               <Menu.Items
-                static
                 className="origin-top absolute left-1/2 transform -translate-x-1/2 mt-2 w-96 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
               >
                 <div className="py-1 flex">
@@ -204,7 +278,7 @@ export default function TaskList() {
           .map((task) => (
             <TaskItem key={task.id} task={task} />
           ))}
-      </dl> 
+      </dl>
 
       <hr className="w-1/4 border-t-4 border-white my-4 opacity-60 shadow-3xl" />
 

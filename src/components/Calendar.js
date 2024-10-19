@@ -7,8 +7,15 @@ function Calendar() {
   const currentDate = new Date();
   const [currentMonth, setCurrentMonth] = useState(currentDate);
 
-  // Get categories from context
-  const { categories } = useAppContext();
+  // Get data and functions from context
+  const {
+    categories,
+    tasks,
+    addTask,
+    taskTypes,
+    getTaskByParentRuleCategoryAndDueDate,
+    getTasksDueOnDate,
+  } = useAppContext();
 
   // Function to switch months
   const handlePrevMonth = () => {
@@ -142,39 +149,63 @@ function Calendar() {
 
         const date = new Date(year, month, dayNumber);
 
-        // Get tasks for this date
-        const tasksForDay = [];
+        // For each category and rule, check if rule applies on this date
         categories.forEach((category) => {
           category.rules.forEach((rule) => {
             if (doesRuleApplyOnDate(rule, date)) {
-              tasksForDay.push({
-                categorySymbol: category.symbol,
-                categoryId: category.id,
-                ruleName: rule.name,
-                // ... any other info
-              });
+              // Check if task already exists
+              const existingTask = getTaskByParentRuleCategoryAndDueDate(
+                rule.id,
+                category.id,
+                date
+              );
+              if (!existingTask) {
+                // Create new task
+                const taskType =
+                  category.type === 'TASK'
+                    ? taskTypes.AUTO_TASK
+                    : taskTypes.AUTO_EVENT;
+                addTask({
+                  label: rule.name,
+                  parentRuleId: rule.id,
+                  parentCategoryId: category.id,
+                  category: category.id,
+                  dueDate: date,
+                  type: taskType,
+                });
+              }
             }
           });
         });
 
+        // Get tasks for this date
+        const tasksForDay = getTasksDueOnDate(date);
+
         days.push(
           <div
             key={dayNumber}
-            className={`h-24 border border-stone-200 flex flex-row items-start p-1 ${
+            className={`h-24 border border-stone-200 flex flex-col items-start p-1 ${
               isToday ? 'bg-blue-100' : 'bg-white'
             } hover:bg-stone-100`}
           >
-            <span className="font-medium text-stone-700 mr-1 w-4">{dayNumber}</span>
+            <span className="font-medium text-stone-700 mr-1 w-4">
+              {dayNumber}
+            </span>
             {/* Render tasks */}
-            <div className="flex flex-col w-24 h-24 pb-1">
+            <div className="flex flex-col w-full h-full pb-1 overflow-hidden">
               {tasksForDay.map((task, index) => (
                 <div
                   key={index}
-                  className="text-xs flex mb-1/2 p-1/2 rounded-md items-center truncate border border-gray-400"
-                  title={`${task.categorySymbol} ${task.ruleName}`}
+                  className="text-xs flex mb-0.5 p-0.5 rounded-md items-center truncate"
+                  title={`${task.label}`}
                 >
-                  <span className="mr-1">{task.categorySymbol}</span>
-                  <span className="truncate">{task.ruleName}</span>
+                  <span className="mr-1">
+                    {
+                      categories.find((cat) => cat.id === task.category)
+                        ?.symbol || ''
+                    }
+                  </span>
+                  <span className="truncate">{task.label}</span>
                 </div>
               ))}
             </div>
@@ -198,29 +229,46 @@ function Calendar() {
 
       const isToday = dayDate.toDateString() === currentDate.toDateString();
 
-      // Get tasks for this date
-      const tasksForDay = [];
+      // For each category and rule, check if rule applies on this date
       categories.forEach((category) => {
         category.rules.forEach((rule) => {
           if (doesRuleApplyOnDate(rule, dayDate)) {
-            tasksForDay.push({
-              categorySymbol: category.symbol,
-              categoryId: category.id,
-              ruleName: rule.name,
-              // ... any other info
-            });
+            // Check if task already exists
+            const existingTask = getTaskByParentRuleCategoryAndDueDate(
+              rule.id,
+              category.id,
+              dayDate
+            );
+            if (!existingTask) {
+              // Create new task
+              const taskType =
+                category.type === 'TASK'
+                  ? taskTypes.AUTO_TASK
+                  : taskTypes.AUTO_EVENT;
+              addTask({
+                label: rule.name,
+                parentRuleId: rule.id,
+                parentCategoryId: category.id,
+                category: category.id,
+                dueDate: dayDate,
+                type: taskType,
+              });
+            }
           }
         });
       });
 
+      // Get tasks for this date
+      const tasksForDay = getTasksDueOnDate(dayDate);
+
       days.push(
         <div
           key={i}
-          className={`h-64 border border-stone-200 flex flex-row items-start p-2 ${
+          className={`h-64 border border-stone-200 flex flex-col items-start p-2 ${
             isToday ? 'bg-blue-100' : 'bg-white'
           } hover:bg-stone-100`}
         >
-          <div className="mr-1">
+          <div className="mb-1">
             <span className="text-sm text-stone-500">
               {dayDate.toLocaleDateString('en-US', { weekday: 'short' })}
             </span>
@@ -229,15 +277,20 @@ function Calendar() {
             </span>
           </div>
           {/* Render tasks */}
-          <div className="flex flex-col flex-grow">
+          <div className="flex flex-col flex-grow overflow-hidden">
             {tasksForDay.map((task, index) => (
               <div
                 key={index}
-                className="text-xs flex items-center truncate"
-                title={`${task.categorySymbol} ${task.ruleName}`}
+                className="text-xs flex items-center truncate mb-0.5"
+                title={`${task.label}`}
               >
-                <span className="mr-1">{task.categorySymbol}</span>
-                <span className="truncate">{task.ruleName}</span>
+                <span className="mr-1">
+                  {
+                    categories.find((cat) => cat.id === task.category)
+                      ?.symbol || ''
+                  }
+                </span>
+                <span className="truncate">{task.label}</span>
               </div>
             ))}
           </div>
