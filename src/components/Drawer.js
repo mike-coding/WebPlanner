@@ -6,6 +6,7 @@ import {
 } from '@heroicons/react/solid';
 import { useAppContext } from './AppContext';
 import CategoryEditorDialog from './CategoryEditorDialog';
+import DB_ConnectWidget from './DB_ConnectionTester';
 
 function Drawer({ isOpen, setIsOpen }) {
   const { categories } = useAppContext();
@@ -63,9 +64,9 @@ function Drawer({ isOpen, setIsOpen }) {
 
           {/* Overview Section */}
           <div className="mb-6 flex flex-row justify-center items-center w-full">
-            <button className="text-xl bg-stone-500 p-3 pt-2 px-8 rounded-md font-semibold text-white hover:bg-stone-600">
-              Overview
-            </button>
+            <div className="text-xl bg-stone-500 p-3 pt-2 px-4 rounded-md font-semibold text-white hover:bg-stone-600">
+              <DB_ConnectWidget/>
+            </div>
           </div>
 
           {/* View Section */}
