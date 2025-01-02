@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Dialog, DialogBackdrop, DialogPanel } from '@headlessui/react';
-import { useAppContext } from './AppContext';
+import { useAppContext } from '../../contexts/AppContext';
 import { createPortal } from 'react-dom';
-import { emojiList } from '../utils/emojiList'; // Import the emoji list
+import { emojiList } from '../../utils/emojiList'; // Import the emoji list
 import { CategoryField, CategoryEntry } from './CategoryField';
 import { RuleField, RuleEntry} from './RuleField';
 

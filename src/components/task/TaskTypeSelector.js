@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAppContext } from './AppContext';
+import { useAppContext } from '../../contexts/AppContext';
 import { Input, Dialog, DialogBackdrop, DialogPanel, MenuButton, MenuItems, MenuItem, Menu, Textarea} from '@headlessui/react';
 
 function TaskTypeSelector({ selectedType, setSelectedType, disabled }) {

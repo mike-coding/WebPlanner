@@ -4,8 +4,8 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
 } from '@heroicons/react/solid';
-import { useAppContext } from './AppContext';
-import CategoryEditorDialog from './CategoryEditorDialog';
+import { useAppContext } from '../contexts/AppContext';
+import CategoryEditorDialog from './category/CategoryEditorDialog';
 import DB_ConnectWidget from './DB_ConnectionTester';
 
 function Drawer({ isOpen, setIsOpen }) {

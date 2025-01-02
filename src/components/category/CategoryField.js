@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Dialog, DialogBackdrop, DialogPanel } from '@headlessui/react';
-import { useAppContext } from './AppContext';
-import TaskTypeSelector from './TaskTypeSelector';
+import { useAppContext } from '../../contexts/AppContext';
+import TaskTypeSelector from '../task/TaskTypeSelector';
 import { createPortal } from 'react-dom';
-import { emojiList } from '../utils/emojiList'; // Import the emoji list
+import { emojiList } from '../../utils/emojiList'; // Import the emoji list
 
 export function CategoryField({ index, category, setEditingCategoryId }) {
     const { taskTypes } = useAppContext();

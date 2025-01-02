@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { useAppContext } from './AppContext';
-import DatePicker from './DatePicker';
-import { useCategories } from './UseCategories';
+import { useAppContext } from '../../contexts/AppContext';
+import DatePicker from '../DatePicker';
+import { useCategories } from '../../hooks/UseCategories';
 
 export function RuleField({ index, rule, categoryId, updateRuleInCategory, deleteRuleFromCategory }) {
   const [hovered, setHovered] = useState(false);

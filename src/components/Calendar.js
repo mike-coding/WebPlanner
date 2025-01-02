@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAppContext } from './AppContext';
+import { useAppContext } from '../contexts/AppContext';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/solid';
 
 function Calendar() {

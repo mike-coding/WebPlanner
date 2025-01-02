@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Input, Dialog, DialogBackdrop, DialogPanel, Textarea} from '@headlessui/react';
-import { useAppContext } from './AppContext';
-import Checkbox from './checkbox';
-import DatePicker from './DatePicker'
+import { useAppContext } from '../../contexts/AppContext';
+import Checkbox from '../checkbox';
+import DatePicker from '../DatePicker'
 import { createPortal } from 'react-dom';
 import TaskTypeSelector from './TaskTypeSelector';
 

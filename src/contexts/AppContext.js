@@ -1,7 +1,7 @@
 import React, { createContext, useContext } from 'react';
-import { useTasks } from './UseTasks';
-import { useCategories} from './UseCategories';
-import { useRules } from './UseRules'
+import { useTasks } from '../hooks/UseTasks';
+import { useCategories} from '../hooks/UseCategories';
+import { useRules } from '../hooks/UseRules'
 
 const AppContext = createContext();
 

@@ -1,7 +1,7 @@
 import { Button } from '@headlessui/react';
 import { useState } from 'react';
 import { Input } from '@headlessui/react';
-import { useAppContext } from './AppContext';
+import { useAppContext } from '../../contexts/AppContext';
 
 export default function TaskEntry() {
     const [thisTask, setThisTask] = useState({ label: "", isCompleted: false, dueDate: new Date()});

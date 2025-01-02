@@ -3,7 +3,7 @@ import { Menu, MenuButton } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/solid';
 import TaskItem from './TaskItem';
 import TodoEntry from './TaskEntry';
-import { useAppContext } from './AppContext';
+import { useAppContext } from '../../contexts/AppContext';
 
 export default function TaskList() {
   const { tasks, categories } = useAppContext();

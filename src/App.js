@@ -1,9 +1,9 @@
 // App.js
-import mainBG from './natureBG.jpg';
+import mainBG from './assets/BGs/natureBG.jpg';
 import './App.css';
 import { useState } from 'react';
 import Drawer from './components/Drawer'; // Updated import
-import TaskList from './components/TaskList';
+import TaskList from './components/task/TaskList';
 import Calendar from './components/Calendar'
 
 function App() {

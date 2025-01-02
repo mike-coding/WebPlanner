@@ -1,8 +1,8 @@
 import { Button } from '@headlessui/react';
-import Checkbox from './checkbox';
+import Checkbox from '../checkbox';
 import TaskEditor from './TaskEditor';
 import { useState } from 'react';
-import { useAppContext } from './AppContext';
+import { useAppContext } from '../../contexts/AppContext';
 
 export default function TaskItem({task}) {
     const [settingsOpen, setSettingsOpen] = useState(false);
