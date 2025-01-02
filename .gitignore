@@ -24,3 +24,7 @@ yarn-debug.log*
 yarn-error.log*
 
 npm_start.bat
+
+
+# custom stuff
+/system_architecture_planning
