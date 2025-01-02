@@ -1,7 +1,7 @@
 ## Screenshots
 
 ### currently: 
-<img src = "screenshot2.PNG">
+<img src = "docs/screenshots/screenshot2.PNG">
 
 ### older version lol
-<img src = "screenshot.PNG">
+<img src = "docs/screenshots/screenshot.PNG">
